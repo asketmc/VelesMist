@@ -34,7 +34,7 @@ func TestAnalyzeFiltersBySellerReceiveThreshold(t *testing.T) {
 	}
 	prices := PriceMap{
 		"Golden Moonfall": {BuyerPriceCents: 1234, Source: "cache"},
-		"Cheap":          {BuyerPriceCents: 400, Source: "cache"},
+		"Cheap":           {BuyerPriceCents: 400, Source: "cache"},
 	}
 	result := Analyze(items, prices, Options{ThresholdCents: 500, FeeBasisPoints: 1500})
 	if len(result.Candidates) != 1 {
