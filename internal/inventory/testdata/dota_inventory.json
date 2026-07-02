@@ -1,0 +1,66 @@
+{
+  "success": 1,
+  "assets": [
+    {
+      "appid": 570,
+      "contextid": "2",
+      "assetid": "1001",
+      "classid": "2001",
+      "instanceid": "0",
+      "amount": "1"
+    },
+    {
+      "appid": 570,
+      "contextid": "2",
+      "assetid": "1002",
+      "classid": "2001",
+      "instanceid": "0",
+      "amount": "1"
+    },
+    {
+      "appid": 570,
+      "contextid": "2",
+      "assetid": "1003",
+      "classid": "2002",
+      "instanceid": "0",
+      "amount": "1"
+    },
+    {
+      "appid": 570,
+      "contextid": "2",
+      "assetid": "1004",
+      "classid": "2003",
+      "instanceid": "0",
+      "amount": "1"
+    }
+  ],
+  "descriptions": [
+    {
+      "appid": 570,
+      "classid": "2001",
+      "instanceid": "0",
+      "name": "Golden Moonfall",
+      "market_hash_name": "Golden Moonfall",
+      "marketable": 1,
+      "tradable": 1
+    },
+    {
+      "appid": 570,
+      "classid": "2002",
+      "instanceid": "0",
+      "name": "Unmarketable Relic",
+      "market_hash_name": "Unmarketable Relic",
+      "marketable": 0,
+      "tradable": 1
+    },
+    {
+      "appid": 570,
+      "classid": "2003",
+      "instanceid": "0",
+      "name": "Jagged Honor | Blade",
+      "market_hash_name": "Jagged Honor | Blade",
+      "marketable": 1,
+      "tradable": 1
+    }
+  ]
+}

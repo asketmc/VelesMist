@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 VelesMist contributors
+# SPDX-License-Identifier: MIT
+
+dist/
+coverage.out
+*.test
+.velesmist-cache.json
+.DS_Store

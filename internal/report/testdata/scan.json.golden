@@ -1,0 +1,57 @@
+{
+  "schema_version": "velesmist.scan.v1",
+  "generated_at": "2026-07-03T00:00:00Z",
+  "steam_id": "76561198000000000",
+  "appid": 570,
+  "contextid": "2",
+  "currency": "USD",
+  "threshold_cents": 500,
+  "items": [
+    {
+      "appid": 570,
+      "name": "Golden Moonfall",
+      "market_hash_name": "Golden Moonfall",
+      "count": 2,
+      "tradable": true,
+      "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
+      "price_status": "priced",
+      "buyer_price_cents": 1234,
+      "seller_receive_cents": 1073,
+      "total_receive_cents": 2146,
+      "price_source": "cache",
+      "candidate": true
+    },
+    {
+      "appid": 570,
+      "name": "Jagged Honor | Blade",
+      "market_hash_name": "Jagged Honor | Blade",
+      "count": 1,
+      "tradable": true,
+      "market_url": "https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade",
+      "price_status": "missing",
+      "candidate": false
+    }
+  ],
+  "candidates": [
+    {
+      "appid": 570,
+      "name": "Golden Moonfall",
+      "market_hash_name": "Golden Moonfall",
+      "count": 2,
+      "tradable": true,
+      "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
+      "price_status": "priced",
+      "buyer_price_cents": 1234,
+      "seller_receive_cents": 1073,
+      "total_receive_cents": 2146,
+      "price_source": "cache",
+      "candidate": true
+    }
+  ],
+  "summary": {
+    "marketable_items": 2,
+    "priced_items": 1,
+    "candidate_items": 1,
+    "estimated_total_receive_cents": 2146
+  }
+}

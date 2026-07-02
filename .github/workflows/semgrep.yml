@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 VelesMist contributors
+# SPDX-License-Identifier: MIT
+
+name: Semgrep
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  schedule:
+    - cron: "53 2 * * 2"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Run Semgrep
+        run: |
+          python3 -m pip install --user semgrep
+          "$HOME/.local/bin/semgrep" scan --config p/golang --config p/security-audit --sarif --output semgrep.sarif
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4
+        with:
+          sarif_file: semgrep.sarif

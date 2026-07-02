@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 VelesMist contributors
+# SPDX-License-Identifier: MIT
+
+header:
+  schema-version: 2.0.0
+  last-updated: 2026-07-03
+  expiration-date: 2027-07-03
+  project-url: https://github.com/asketmc/VelesMist
+  project-release: 0.1.0
+project-lifecycle:
+  status: active
+  roadmap: https://github.com/asketmc/VelesMist/issues
+  bug-fixes-only: false
+  core-maintainers:
+    - https://github.com/asketmc
+contribution-policy:
+  accepts-pull-requests: true
+  accepts-automated-pull-requests: true
+  contributing-policy: https://github.com/asketmc/VelesMist/blob/main/CONTRIBUTING.md
+documentation:
+  - https://github.com/asketmc/VelesMist/blob/main/README.md
+distribution-points:
+  - https://github.com/asketmc/VelesMist/releases
+security-artifacts:
+  self-assessment:
+    self-assessment-created: 2026-07-03
+    evidence-url:
+      - https://github.com/asketmc/VelesMist/blob/main/docs/OSS_ASSURANCE.md
+security-contacts:
+  - type: email
+    value: security@example.invalid
+vulnerability-reporting:
+  accepts-vulnerability-reports: true
+  email-contact: security@example.invalid
+  security-policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
+dependencies:
+  third-party-packages: false
+security-testing:
+  - tool-type: sca
+    tool-name: govulncheck
+    integration:
+      ci: true
+      before-release: true
+  - tool-type: sast
+    tool-name: CodeQL
+    integration:
+      ci: true
+      before-release: true
+  - tool-type: sast
+    tool-name: Semgrep
+    integration:
+      ci: true
+      before-release: true

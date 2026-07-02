@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2026 VelesMist contributors
+# SPDX-License-Identifier: MIT
+
+* @asketmc
+
+.github/CODEOWNERS @asketmc
+.github/dependabot.yml @asketmc
+.github/ISSUE_TEMPLATE/* @asketmc
+.github/pull_request_template.md @asketmc
+.github/workflows/* @asketmc
+security-insights.yml @asketmc
+REUSE.toml @asketmc
+go.mod @asketmc
+go.sum @asketmc
+Makefile @asketmc
+scripts/* @asketmc
+SECURITY.md @asketmc
+docs/RELEASE_SECURITY.md @asketmc
+docs/VERIFY_RELEASE.md @asketmc
+docs/REPOSITORY_RULESET.md @asketmc
+docs/THREAT_MODEL.md @asketmc
+docs/OSS_ASSURANCE.md @asketmc
+internal/assurance/* @asketmc

@@ -1,0 +1,19 @@
+version = 1
+
+[[annotations]]
+path = [
+  ".github/**",
+  "docs/**",
+  "internal/**/testdata/**",
+  "README.md",
+  "CHANGELOG.md",
+  "CODE_OF_CONDUCT.md",
+  "CONTRIBUTING.md",
+  "LICENSE",
+  "LICENSES/MIT.txt",
+  "SECURITY.md",
+  "security-insights.yml",
+  "go.mod",
+]
+SPDX-FileCopyrightText = "2026 VelesMist contributors"
+SPDX-License-Identifier = "MIT"

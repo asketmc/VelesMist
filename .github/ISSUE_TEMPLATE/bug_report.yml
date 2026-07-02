@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: 2026 VelesMist contributors
+# SPDX-License-Identifier: MIT
+
+name: Bug report
+description: Report a reproducible VelesMist problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include Steam passwords, Steam Guard codes, cookies, session IDs, API keys, private inventory exports, generated sell reports, or local cache files.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use sanitized fixtures whenever possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: data_safety
+    attributes:
+      label: Data safety check
+      options:
+        - I used only sanitized fixtures or public non-sensitive data.
+        - I need maintainer guidance before sharing private data.
+    validations:
+      required: true
