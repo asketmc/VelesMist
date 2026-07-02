@@ -11,9 +11,9 @@ import (
 
 func TestParseMoneyToCents(t *testing.T) {
 	tests := map[string]int64{
-		"$12.34":  1234,
-		"12,30":   1230,
-		"5":       500,
+		"$12.34":   1234,
+		"12,30":    1230,
+		"5":        500,
 		"0.99 USD": 99,
 	}
 	for input, want := range tests {
