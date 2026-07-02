@@ -10,7 +10,7 @@ This project implements controls for supply-chain and open-source hygiene. It is
 | Dependabot | Implemented | `.github/dependabot.yml` |
 | Dependency Review | Implemented | `.github/workflows/dependency-review.yml` |
 | Docs checks | Implemented | `.github/workflows/docs.yml`, `internal/assurance` |
-| Secret Scanning / Push Protection | Requires GitHub setting | `docs/REPOSITORY_RULESET.md` |
+| Secret Scanning / Push Protection | Implemented | Enabled in GitHub repository settings |
 | REUSE compliance | Implemented | `REUSE.toml`, `LICENSES/MIT.txt`, `.github/workflows/reuse.yml` |
 | SPDX license metadata | Implemented | SPDX headers and REUSE annotations |
 | SPDX SBOM | Implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml` |
@@ -22,8 +22,8 @@ This project implements controls for supply-chain and open-source hygiene. It is
 | Sigstore / cosign release signing | Requires first release | `.github/workflows/release.yml` |
 | Workflow pinning policy | Implemented | `docs/WORKFLOW_PINNING.md`, `internal/assurance` tests |
 | Security Insights metadata | Implemented | `security-insights.yml` |
-| Branch protection / required checks | Requires GitHub setting | `docs/REPOSITORY_RULESET.md` |
-| CODEOWNERS review control | Implemented, requires branch protection to enforce | `.github/CODEOWNERS` |
+| Branch protection / required checks | Implemented | `main` branch protection and `docs/REPOSITORY_RULESET.md` |
+| CODEOWNERS review control | Implemented | `.github/CODEOWNERS`, enforced by `main` branch protection |
 | Docker image / container scan | Not applicable | No container distribution strategy |
 | SonarCloud / Codecov / FOSSA / Snyk | Not planned | Avoid external SaaS badges without a concrete need |
 | Renovate | Not planned | Dependabot is the selected dependency bot |
@@ -34,13 +34,15 @@ VelesMist uses the Go standard library for runtime code. Tooling dependencies ar
 
 ## Required Checks For `main`
 
-Minimum required checks after first push:
+Required checks on `main`:
 
 - `CI tests`;
-- `CodeQL`;
-- `Dependency Review`;
-- `Docs`;
-- `REUSE`;
-- `OSV Scanner`.
+- `Analyze Go`;
+- `dependency-review`;
+- `reuse`;
+- `scan`;
+- `semgrep`;
+- `docs`;
+- `sbom`.
 
-Semgrep and Scorecard should run continuously. Promote them to required checks only after they prove stable for this repository.
+Scorecard runs on push, schedule, and branch protection changes. It is not required on pull requests because the workflow is not configured to run on `pull_request`.

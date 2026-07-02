@@ -33,3 +33,19 @@ func TestValidateRejectsInvalidFormat(t *testing.T) {
 		t.Fatal("expected invalid format error")
 	}
 }
+
+func TestParsePriceTemplateRejectsPositionalArgs(t *testing.T) {
+	if _, err := ParsePriceTemplate([]string{"extra"}); err == nil {
+		t.Fatal("expected positional argument error")
+	}
+}
+
+func TestParsePriceTemplateAcceptsOutputAndForce(t *testing.T) {
+	cfg, err := ParsePriceTemplate([]string{"--output", "price-cache.json", "--force"})
+	if err != nil {
+		t.Fatalf("ParsePriceTemplate error: %v", err)
+	}
+	if cfg.Output != "price-cache.json" || !cfg.Force {
+		t.Fatalf("unexpected config: %+v", cfg)
+	}
+}

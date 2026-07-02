@@ -16,9 +16,13 @@
       "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
       "price_status": "priced",
       "buyer_price_cents": 1234,
+      "estimated_fee_cents": 161,
       "seller_receive_cents": 1073,
+      "total_buyer_price_cents": 2468,
+      "total_estimated_fee_cents": 322,
       "total_receive_cents": 2146,
       "price_source": "cache",
+      "recommendation": "sell",
       "candidate": true
     },
     {
@@ -29,6 +33,7 @@
       "tradable": true,
       "market_url": "https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade",
       "price_status": "missing",
+      "recommendation": "missing_price",
       "candidate": false
     }
   ],
@@ -42,16 +47,24 @@
       "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
       "price_status": "priced",
       "buyer_price_cents": 1234,
+      "estimated_fee_cents": 161,
       "seller_receive_cents": 1073,
+      "total_buyer_price_cents": 2468,
+      "total_estimated_fee_cents": 322,
       "total_receive_cents": 2146,
       "price_source": "cache",
+      "recommendation": "sell",
       "candidate": true
     }
   ],
   "summary": {
     "marketable_items": 2,
     "priced_items": 1,
+    "missing_price_items": 1,
+    "skipped_items": 0,
     "candidate_items": 1,
+    "estimated_total_gross_cents": 2468,
+    "estimated_total_fee_cents": 322,
     "estimated_total_receive_cents": 2146
   }
 }

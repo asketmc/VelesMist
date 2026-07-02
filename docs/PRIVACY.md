@@ -21,6 +21,8 @@ Inventory HTTP responses may be cached as JSON.
 
 Delete the cache file to remove local cached data.
 
+The optional `velesmist.price-cache.v1` price cache is supplied by the operator and stays local. It is read from the path passed with `--price-cache`; VelesMist does not upload it or use it to call a pricing provider.
+
 ## Data Sent To External APIs
 
 VelesMist sends read-only HTTPS requests to Steam Community public inventory endpoints.

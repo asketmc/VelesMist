@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -27,7 +26,7 @@ func main() {
 
 func run(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprintln(stderr, "usage: velesmist <scan|version> [options]")
+		fmt.Fprintln(stderr, "usage: velesmist <scan|prices|version> [options]")
 		return apperrors.ExitInvalidInput
 	}
 
@@ -36,6 +35,8 @@ func run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runVersion(stdout)
 	case "scan":
 		return runScan(args[1:], stdout, stderr)
+	case "prices":
+		return runPrices(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "unknown command: %s\n", args[0])
 		return apperrors.ExitInvalidInput
@@ -144,11 +145,45 @@ func loadPrices(path string) (pricing.PriceMap, error) {
 	}
 	defer file.Close()
 
-	var raw map[string]pricing.PriceInput
-	decoder := json.NewDecoder(file)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&raw); err != nil {
-		return nil, apperrors.Wrap(apperrors.InvalidInput, "decode price cache", err)
+	prices, _, err := pricing.LoadPriceCache(file)
+	return prices, err
+}
+
+func runPrices(args []string, stdout io.Writer, stderr io.Writer) int {
+	if len(args) == 0 {
+		fmt.Fprintln(stderr, "usage: velesmist prices <template>")
+		return apperrors.ExitInvalidInput
 	}
-	return pricing.LoadPriceMap(raw)
+	switch args[0] {
+	case "template":
+		cfg, err := config.ParsePriceTemplate(args[1:])
+		if err != nil {
+			fmt.Fprintf(stderr, "invalid input: %v\n", err)
+			return apperrors.ExitCode(err)
+		}
+		if err := writePriceTemplate(cfg, stdout); err != nil {
+			fmt.Fprintf(stderr, "prices template failed: %v\n", err)
+			return apperrors.ExitCode(err)
+		}
+		return apperrors.ExitSuccess
+	default:
+		fmt.Fprintf(stderr, "unknown prices command: %s\n", args[0])
+		return apperrors.ExitInvalidInput
+	}
+}
+
+func writePriceTemplate(cfg config.PriceTemplateConfig, stdout io.Writer) error {
+	if cfg.Output == "" {
+		return pricing.WritePriceCacheTemplate(stdout)
+	}
+	flags := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	if !cfg.Force {
+		flags = os.O_WRONLY | os.O_CREATE | os.O_EXCL
+	}
+	file, err := os.OpenFile(cfg.Output, flags, 0o644)
+	if err != nil {
+		return apperrors.Wrap(apperrors.InvalidInput, "open price template output", err)
+	}
+	defer file.Close()
+	return pricing.WritePriceCacheTemplate(file)
 }

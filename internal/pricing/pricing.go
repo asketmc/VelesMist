@@ -18,6 +18,7 @@ type PriceInput struct {
 	BuyerPriceCents int64  `json:"buyer_price_cents,omitempty"`
 	LowestPrice     string `json:"lowest_price,omitempty"`
 	MedianPrice     string `json:"median_price,omitempty"`
+	Source          string `json:"source,omitempty"`
 }
 
 type Price struct {
@@ -33,24 +34,37 @@ type Options struct {
 }
 
 type PricedItem struct {
-	AppID              int    `json:"appid"`
-	Name               string `json:"name"`
-	MarketHashName     string `json:"market_hash_name"`
-	Count              int    `json:"count"`
-	Tradable           bool   `json:"tradable"`
-	MarketURL          string `json:"market_url"`
-	PriceStatus        string `json:"price_status"`
-	BuyerPriceCents    int64  `json:"buyer_price_cents,omitempty"`
-	SellerReceiveCents int64  `json:"seller_receive_cents,omitempty"`
-	TotalReceiveCents  int64  `json:"total_receive_cents,omitempty"`
-	PriceSource        string `json:"price_source,omitempty"`
-	Candidate          bool   `json:"candidate"`
+	AppID                  int    `json:"appid"`
+	Name                   string `json:"name"`
+	MarketHashName         string `json:"market_hash_name"`
+	Count                  int    `json:"count"`
+	Tradable               bool   `json:"tradable"`
+	MarketURL              string `json:"market_url"`
+	PriceStatus            string `json:"price_status"`
+	BuyerPriceCents        int64  `json:"buyer_price_cents,omitempty"`
+	EstimatedFeeCents      int64  `json:"estimated_fee_cents,omitempty"`
+	SellerReceiveCents     int64  `json:"seller_receive_cents,omitempty"`
+	TotalBuyerPriceCents   int64  `json:"total_buyer_price_cents,omitempty"`
+	TotalEstimatedFeeCents int64  `json:"total_estimated_fee_cents,omitempty"`
+	TotalReceiveCents      int64  `json:"total_receive_cents,omitempty"`
+	PriceSource            string `json:"price_source,omitempty"`
+	Recommendation         string `json:"recommendation"`
+	Candidate              bool   `json:"candidate"`
 }
 
 type Analysis struct {
 	Items      []PricedItem
 	Candidates []PricedItem
 }
+
+const (
+	PriceStatusMissing = "missing"
+	PriceStatusPriced  = "priced"
+
+	RecommendationSell         = "sell"
+	RecommendationSkip         = "skip"
+	RecommendationMissingPrice = "missing_price"
+)
 
 func LoadPriceMap(raw map[string]PriceInput) (PriceMap, error) {
 	prices := make(PriceMap, len(raw))
@@ -69,7 +83,11 @@ func LoadPriceMap(raw map[string]PriceInput) (PriceMap, error) {
 		if cents <= 0 {
 			continue
 		}
-		prices[name] = Price{BuyerPriceCents: cents, Source: "cache"}
+		source := strings.TrimSpace(input.Source)
+		if source == "" {
+			source = "price-cache"
+		}
+		prices[name] = Price{BuyerPriceCents: cents, Source: source}
 	}
 	return prices, nil
 }
@@ -87,29 +105,68 @@ func Analyze(items []inventory.AggregatedItem, prices PriceMap, opts Options) An
 			Count:          item.Count,
 			Tradable:       item.Tradable,
 			MarketURL:      MarketURL(item.AppID, item.MarketHashName),
-			PriceStatus:    "missing",
+			PriceStatus:    PriceStatusMissing,
+			Recommendation: RecommendationMissingPrice,
 		}
 		if price, ok := prices[item.MarketHashName]; ok {
 			seller := BuyerToSellerCents(price.BuyerPriceCents, opts.FeeBasisPoints)
-			row.PriceStatus = "priced"
+			fee := price.BuyerPriceCents - seller
+			row.PriceStatus = PriceStatusPriced
 			row.BuyerPriceCents = price.BuyerPriceCents
+			row.EstimatedFeeCents = fee
 			row.SellerReceiveCents = seller
+			row.TotalBuyerPriceCents = price.BuyerPriceCents * int64(item.Count)
+			row.TotalEstimatedFeeCents = fee * int64(item.Count)
 			row.TotalReceiveCents = seller * int64(item.Count)
 			row.PriceSource = price.Source
-			row.Candidate = seller >= opts.ThresholdCents
+			if seller >= opts.ThresholdCents {
+				row.Recommendation = RecommendationSell
+				row.Candidate = true
+			} else {
+				row.Recommendation = RecommendationSkip
+			}
 		}
 		result.Items = append(result.Items, row)
 		if row.Candidate {
 			result.Candidates = append(result.Candidates, row)
 		}
 	}
-	sort.SliceStable(result.Candidates, func(i, j int) bool {
-		if result.Candidates[i].TotalReceiveCents == result.Candidates[j].TotalReceiveCents {
-			return result.Candidates[i].MarketHashName < result.Candidates[j].MarketHashName
-		}
-		return result.Candidates[i].TotalReceiveCents > result.Candidates[j].TotalReceiveCents
-	})
+	sortPricedItems(result.Items)
+	sortPricedItems(result.Candidates)
 	return result
+}
+
+func sortPricedItems(items []PricedItem) {
+	sort.SliceStable(items, func(i, j int) bool {
+		left := items[i]
+		right := items[j]
+		if recommendationRank(left.Recommendation) != recommendationRank(right.Recommendation) {
+			return recommendationRank(left.Recommendation) < recommendationRank(right.Recommendation)
+		}
+		if left.TotalReceiveCents != right.TotalReceiveCents {
+			return left.TotalReceiveCents > right.TotalReceiveCents
+		}
+		if left.BuyerPriceCents != right.BuyerPriceCents {
+			return left.BuyerPriceCents > right.BuyerPriceCents
+		}
+		if left.Count != right.Count {
+			return left.Count > right.Count
+		}
+		return left.MarketHashName < right.MarketHashName
+	})
+}
+
+func recommendationRank(recommendation string) int {
+	switch recommendation {
+	case RecommendationSell:
+		return 0
+	case RecommendationSkip:
+		return 1
+	case RecommendationMissingPrice:
+		return 2
+	default:
+		return 3
+	}
 }
 
 func BuyerToSellerCents(buyerPriceCents int64, feeBasisPoints int64) int64 {

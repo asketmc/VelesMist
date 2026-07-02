@@ -38,6 +38,11 @@ type ScanConfig struct {
 	SteamBaseURL   string
 }
 
+type PriceTemplateConfig struct {
+	Output string
+	Force  bool
+}
+
 func ParseScan(args []string) (ScanConfig, error) {
 	cfg := defaultScanConfig()
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
@@ -65,6 +70,21 @@ func ParseScan(args []string) (ScanConfig, error) {
 	}
 	cfg.MinPriceCents = cents
 	return cfg, ValidateScan(cfg)
+}
+
+func ParsePriceTemplate(args []string) (PriceTemplateConfig, error) {
+	var cfg PriceTemplateConfig
+	fs := flag.NewFlagSet("prices template", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	fs.StringVar(&cfg.Output, "output", "", "write the price-cache template to a file instead of stdout")
+	fs.BoolVar(&cfg.Force, "force", false, "overwrite an existing output file")
+	if err := fs.Parse(args); err != nil {
+		return PriceTemplateConfig{}, apperrors.Wrap(apperrors.InvalidInput, "parse prices template flags", err)
+	}
+	if fs.NArg() != 0 {
+		return PriceTemplateConfig{}, apperrors.New(apperrors.InvalidInput, "prices template does not accept positional arguments")
+	}
+	return cfg, nil
 }
 
 func ValidateScan(cfg ScanConfig) error {

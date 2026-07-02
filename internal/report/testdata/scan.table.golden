@@ -1,5 +1,5 @@
-ITEM                  COUNT  BUYER      YOU_RECEIVE  TOTAL      STATUS
-Golden Moonfall       2      USD 12.34  USD 10.73    USD 21.46  candidate
-Jagged Honor | Blade  1      -          -            -          missing
+ITEM                  COUNT  GROSS      FEE       YOU_RECEIVE  TOTAL      RECOMMENDATION  MARKET_URL
+Golden Moonfall       2      USD 12.34  USD 1.61  USD 10.73    USD 21.46  sell            https://steamcommunity.com/market/listings/570/Golden%20Moonfall
+Jagged Honor | Blade  1      -          -         -            -          missing_price   https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade
 
-Candidates: 1 Estimated total receive: USD 21.46
+Sell recommendations: 1 Estimated gross: USD 24.68 Estimated fees: USD 3.22 Estimated receive: USD 21.46

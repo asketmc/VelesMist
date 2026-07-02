@@ -4,6 +4,7 @@
 package pricing
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/asketmc/VelesMist/internal/inventory"
@@ -47,6 +48,15 @@ func TestAnalyzeFiltersBySellerReceiveThreshold(t *testing.T) {
 	if got.SellerReceiveCents != 1073 || got.TotalReceiveCents != 2146 {
 		t.Fatalf("seller=%d total=%d, want seller=1073 total=2146", got.SellerReceiveCents, got.TotalReceiveCents)
 	}
+	if got.EstimatedFeeCents != 161 || got.TotalEstimatedFeeCents != 322 {
+		t.Fatalf("fee=%d total_fee=%d, want fee=161 total_fee=322", got.EstimatedFeeCents, got.TotalEstimatedFeeCents)
+	}
+	if got.Recommendation != RecommendationSell {
+		t.Fatalf("recommendation = %s, want %s", got.Recommendation, RecommendationSell)
+	}
+	if result.Items[1].Recommendation != RecommendationSkip {
+		t.Fatalf("cheap recommendation = %s, want %s", result.Items[1].Recommendation, RecommendationSkip)
+	}
 }
 
 func TestLoadPriceMapUsesLowestThenMedian(t *testing.T) {
@@ -59,5 +69,35 @@ func TestLoadPriceMapUsesLowestThenMedian(t *testing.T) {
 	}
 	if got["A"].BuyerPriceCents != 250 || got["B"].BuyerPriceCents != 125 {
 		t.Fatalf("unexpected prices: %+v", got)
+	}
+}
+
+func TestLoadPriceCacheV1(t *testing.T) {
+	input := `{
+	  "schema_version": "velesmist.price-cache.v1",
+	  "currency": "USD",
+	  "prices": {
+	    "Golden Moonfall": {
+	      "buyer_price_cents": 1234,
+	      "source": "manual"
+	    }
+	  }
+	}`
+	prices, meta, err := LoadPriceCache(strings.NewReader(input))
+	if err != nil {
+		t.Fatalf("LoadPriceCache error: %v", err)
+	}
+	if meta.SchemaVersion != PriceCacheSchemaVersion || meta.Currency != "USD" || meta.Count != 1 {
+		t.Fatalf("unexpected metadata: %+v", meta)
+	}
+	if prices["Golden Moonfall"].BuyerPriceCents != 1234 || prices["Golden Moonfall"].Source != "manual" {
+		t.Fatalf("unexpected price: %+v", prices["Golden Moonfall"])
+	}
+}
+
+func TestLoadPriceCacheRejectsWrongSchema(t *testing.T) {
+	input := `{"schema_version":"v0","currency":"USD","prices":{}}`
+	if _, _, err := LoadPriceCache(strings.NewReader(input)); err == nil {
+		t.Fatal("expected schema error")
 	}
 }
