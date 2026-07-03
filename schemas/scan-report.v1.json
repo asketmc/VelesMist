@@ -3,7 +3,7 @@
   "$id": "https://github.com/asketmc/VelesMist/schemas/scan-report.v1.json",
   "title": "VelesMist scan report v1",
   "description": "Stable JSON output contract for VelesMist scan reports. Items are sorted by recommendation priority, then total seller receive, buyer price, count, and market_hash_name.",
-  "$comment": "Recommendation sorting order is sell, skip, missing_price. Unpriced items use price_status=missing and recommendation=missing_price.",
+  "$comment": "Recommendation sorting order is sell, skip, missing_price. The planned/not-yet-implemented recommendation value not_marketable is reserved for a future contract update and is documented here without being accepted by scan-report.v1 validation. Unpriced items use price_status=missing and recommendation=missing_price.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -64,6 +64,7 @@
   "$defs": {
     "item": {
       "type": "object",
+      "description": "A report item identity is appid, name, market_hash_name, count, tradable, and market_url. market_hash_name is the stable key used for local price-cache lookup.",
       "additionalProperties": false,
       "required": [
         "appid",
@@ -171,7 +172,165 @@
         "candidate": {
           "type": "boolean"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "price_status": {
+                "const": "priced"
+              }
+            },
+            "required": [
+              "price_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "buyer_price_cents",
+              "estimated_fee_cents",
+              "seller_receive_cents",
+              "total_buyer_price_cents",
+              "total_estimated_fee_cents",
+              "total_receive_cents",
+              "price_source"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "price_status": {
+                "const": "missing"
+              }
+            },
+            "required": [
+              "price_status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "recommendation": {
+                "const": "missing_price"
+              },
+              "confidence": {
+                "const": "none"
+              },
+              "candidate": {
+                "const": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "buyer_price_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "estimated_fee_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "seller_receive_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "total_buyer_price_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "total_estimated_fee_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "total_receive_cents"
+                  ]
+                },
+                {
+                  "required": [
+                    "price_source"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recommendation": {
+                "const": "sell"
+              }
+            },
+            "required": [
+              "recommendation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "price_status": {
+                "const": "priced"
+              },
+              "candidate": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recommendation": {
+                "const": "skip"
+              }
+            },
+            "required": [
+              "recommendation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "price_status": {
+                "const": "priced"
+              },
+              "candidate": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "recommendation": {
+                "const": "missing_price"
+              }
+            },
+            "required": [
+              "recommendation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "price_status": {
+                "const": "missing"
+              },
+              "confidence": {
+                "const": "none"
+              },
+              "candidate": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
     },
     "summary": {
       "type": "object",

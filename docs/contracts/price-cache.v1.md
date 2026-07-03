@@ -28,5 +28,7 @@ Optional:
 
 - Unsupported `schema_version` fails with invalid input.
 - Unknown top-level fields fail decoding.
+- Entries with no price field fail contract validation.
+- Entries with unparseable `lowest_price` or `median_price` fail loader validation.
 - Entries with no usable positive price are ignored by the loader.
 - Items without a matching price cache entry appear in scan output as `missing_price`.

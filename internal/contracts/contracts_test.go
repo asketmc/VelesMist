@@ -233,7 +233,21 @@ func validateScanItem(item map[string]any) error {
 		); err != nil {
 			return err
 		}
+		if stringField(item, "price_source") == "" {
+			return fmt.Errorf("priced items must include price_source")
+		}
 	case "missing":
+		if err := rejectKeys(item,
+			"buyer_price_cents",
+			"estimated_fee_cents",
+			"seller_receive_cents",
+			"total_buyer_price_cents",
+			"total_estimated_fee_cents",
+			"total_receive_cents",
+			"price_source",
+		); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("invalid price_status %q", stringField(item, "price_status"))
 	}
@@ -261,6 +275,20 @@ func validateScanItem(item map[string]any) error {
 	}
 	if _, ok := item["candidate"].(bool); !ok {
 		return fmt.Errorf("candidate must be boolean")
+	}
+	switch stringField(item, "recommendation") {
+	case "sell":
+		if stringField(item, "price_status") != "priced" || !boolField(item, "candidate") {
+			return fmt.Errorf("sell recommendation must be priced and candidate=true")
+		}
+	case "skip":
+		if stringField(item, "price_status") != "priced" || boolField(item, "candidate") {
+			return fmt.Errorf("skip recommendation must be priced and candidate=false")
+		}
+	case "missing_price":
+		if stringField(item, "price_status") != "missing" || stringField(item, "confidence") != "none" || boolField(item, "candidate") {
+			return fmt.Errorf("missing_price recommendation must be missing/confidence=none/candidate=false")
+		}
 	}
 	return nil
 }
@@ -360,6 +388,15 @@ func rejectUnknownKeys(object map[string]any, keys ...string) error {
 	for key := range object {
 		if !allowed[key] {
 			return fmt.Errorf("unknown field %q", key)
+		}
+	}
+	return nil
+}
+
+func rejectKeys(object map[string]any, keys ...string) error {
+	for _, key := range keys {
+		if _, ok := object[key]; ok {
+			return fmt.Errorf("field %q is not allowed", key)
 		}
 	}
 	return nil

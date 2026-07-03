@@ -19,6 +19,8 @@ The JSON report contract is stable for automation within schema version `velesmi
 
 ## Item Fields
 
+- Item identity fields: `appid`, `name`, `market_hash_name`, `count`, `tradable`, and `market_url`.
+- `market_hash_name`: Steam market hash name used as the price-cache lookup key and market URL identity.
 - `recommendation`: one of `sell`, `skip`, `missing_price`.
 - `not_marketable`: planned recommendation value for a future product PR; it is not emitted by the current v1 implementation.
 - `price_status`: one of `priced`, `missing`.
@@ -34,6 +36,14 @@ The JSON report contract is stable for automation within schema version `velesmi
 - `market_url`: Steam Community Market URL derived from `market_hash_name`.
 - `candidate`: true only for `sell` recommendations.
 
+Priced items must include gross buyer price, estimated fee, seller receive, total gross buyer price, total estimated fee, total receive, and `price_source`.
+
+Missing-price items use `price_status: "missing"`, `recommendation: "missing_price"`, `confidence: "none"`, `candidate: false`, and omit gross/fee/receive fields.
+
+## Currency Behavior
+
+The report `currency` field is a label inherited from config or the local price cache. VelesMist does not convert currencies in `velesmist.scan.v1`; all `*_cents` values are interpreted in that selected currency.
+
 ## Sorting Rules
 
 Report rows are sorted by recommendation priority, then total seller receive, buyer price, count, and `market_hash_name`.
@@ -48,4 +58,4 @@ Recommendation priority:
 
 VelesMist will not remove or rename fields inside `velesmist.scan.v1` without introducing a new schema version. New optional fields may be added only when they do not break existing automation.
 
-Unmarketable inventory items are not emitted by this contract yet. Reporting them explicitly is planned as a separate TDD product PR.
+Unmarketable inventory items are not emitted by this contract yet. Reporting them explicitly with the reserved `not_marketable` recommendation is planned as a separate TDD product PR.
