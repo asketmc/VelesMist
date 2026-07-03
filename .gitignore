@@ -3,6 +3,7 @@
 
 dist/
 coverage.out
+coverage.txt
 *.test
 .velesmist-cache.json
 .DS_Store

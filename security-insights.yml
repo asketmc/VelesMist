@@ -2,52 +2,85 @@
 # SPDX-License-Identifier: MIT
 
 header:
-  schema-version: 2.0.0
+  schema-version: 2.2.0
   last-updated: 2026-07-03
-  expiration-date: 2027-07-03
-  project-url: https://github.com/asketmc/VelesMist
-  project-release: 0.1.0
-project-lifecycle:
-  status: active
+  last-reviewed: 2026-07-03
+  url: https://raw.githubusercontent.com/asketmc/VelesMist/main/security-insights.yml
+  comment: >
+    Single-repository Security Insights metadata for VelesMist.
+
+project:
+  name: VelesMist
+  homepage: https://github.com/asketmc/VelesMist
   roadmap: https://github.com/asketmc/VelesMist/issues
+  administrators:
+    - name: Asketmc
+      social: https://github.com/asketmc
+      primary: true
+  documentation:
+    quickstart-guide: https://github.com/asketmc/VelesMist/blob/main/README.md
+    code-of-conduct: https://github.com/asketmc/VelesMist/blob/main/CODE_OF_CONDUCT.md
+    release-process: https://github.com/asketmc/VelesMist/blob/main/docs/RELEASE_SECURITY.md
+    signature-verification: https://github.com/asketmc/VelesMist/blob/main/docs/VERIFY_RELEASE.md
+    support-policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
+  repositories:
+    - name: VelesMist
+      url: https://github.com/asketmc/VelesMist
+      comment: Primary source repository for the VelesMist CLI.
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
+    comment: >
+      Use GitHub private vulnerability reporting for exploitable issues or
+      sensitive data exposure. Do not publish real Steam credentials, cookies,
+      tokens, private inventory exports, generated sell reports, or local cache
+      files in public issues.
+
+repository:
+  url: https://github.com/asketmc/VelesMist
+  status: active
+  accepts-change-request: true
+  accepts-automated-change-request: true
   bug-fixes-only: false
-  core-maintainers:
-    - https://github.com/asketmc
-contribution-policy:
-  accepts-pull-requests: true
-  accepts-automated-pull-requests: true
-  contributing-policy: https://github.com/asketmc/VelesMist/blob/main/CONTRIBUTING.md
-documentation:
-  - https://github.com/asketmc/VelesMist/blob/main/README.md
-distribution-points:
-  - https://github.com/asketmc/VelesMist/releases
-security-artifacts:
-  self-assessment:
-    self-assessment-created: 2026-07-03
-    evidence-url:
-      - https://github.com/asketmc/VelesMist/blob/main/docs/OSS_ASSURANCE.md
-security-contacts:
-  - type: email
-    value: security@example.invalid
-vulnerability-reporting:
-  accepts-vulnerability-reports: true
-  email-contact: security@example.invalid
-  security-policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
-dependencies:
-  third-party-packages: false
-security-testing:
-  - tool-type: sca
-    tool-name: govulncheck
-    integration:
-      ci: true
-      before-release: true
-  - tool-type: sast
-    tool-name: CodeQL
-    integration:
-      ci: true
-      before-release: true
-  - tool-type: sast
-    tool-name: Semgrep
-    integration:
-      ci: true
-      before-release: true
+  core-team:
+    - name: Asketmc
+      social: https://github.com/asketmc
+      primary: true
+  documentation:
+    contributing-guide: https://github.com/asketmc/VelesMist/blob/main/CONTRIBUTING.md
+    dependency-management-policy: https://github.com/asketmc/VelesMist/blob/main/docs/OSS_ASSURANCE.md
+    governance: https://github.com/asketmc/VelesMist/blob/main/.github/CODEOWNERS
+    review-policy: https://github.com/asketmc/VelesMist/blob/main/.github/pull_request_template.md
+    security-policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
+  release:
+    automated-pipeline: true
+    changelog: https://github.com/asketmc/VelesMist/releases/tag/{version}
+    distribution-points:
+      - uri: https://github.com/asketmc/VelesMist/releases
+        comment: GitHub Releases page for source and binary release artifacts.
+    attestations:
+      - name: GitHub artifact attestation / SLSA provenance
+        predicate-uri: https://slsa.dev/provenance/v1
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Verify release artifacts with `gh attestation verify --repo asketmc/VelesMist --source-ref refs/tags/{version}`.
+      - name: SPDX SBOM
+        predicate-uri: https://spdx.dev/Document
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Release assets include `sbom.spdx.json`.
+      - name: CycloneDX SBOM
+        predicate-uri: https://cyclonedx.org/schema
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Release assets include `sbom.cdx.json`.
+  license:
+    url: https://github.com/asketmc/VelesMist/blob/main/LICENSE
+    expression: MIT
+  security:
+    assessments:
+      self:
+        name: OSS assurance self-assessment
+        evidence: https://github.com/asketmc/VelesMist/blob/main/docs/OSS_ASSURANCE.md
+        date: 2026-07-03
+        comment: >
+          Self-assessment only. This project is not certified secure and has
+          not undergone a formal external audit.

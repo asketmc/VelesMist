@@ -1,0 +1,9 @@
+{
+  "schema_version": "velesmist.price-cache.v0",
+  "currency": "USD",
+  "prices": {
+    "Golden Moonfall": {
+      "buyer_price_cents": 1234
+    }
+  }
+}
