@@ -5,7 +5,7 @@ This document maps assurance and build artifacts to their producer, trigger, loc
 | Artifact | Producer | Trigger | Location | Verification method | Status |
 | --- | --- | --- | --- | --- | --- |
 | Local binary | `make build` / `make verify` | Developer runs local build or verification gate | `dist/velesmist` | Run `dist/velesmist version`; inspect build command for `CGO_ENABLED=0` and `-trimpath` | implemented |
-| Release binary archives | `.github/workflows/release.yml` | GitHub Release is published from a tag | GitHub Release assets, for example `v0.1.0` | Download archive, verify checksum, extract, run `velesmist version` | implemented |
+| Release binary archives | `.github/workflows/release.yml` | GitHub Release is published from a tag | GitHub Release assets for the selected tag | Download archive, verify checksum, extract, run `velesmist version` | implemented |
 | Checksums | `.github/workflows/release.yml` | GitHub Release is published from a tag | GitHub Release asset `SHA256SUMS.txt` | `sha256sum --check SHA256SUMS.txt` or compare with `Get-FileHash` | implemented |
 | SPDX SBOM | `.github/workflows/sbom.yml`, `.github/workflows/release.yml` | PR/push CI and tagged release | CI artifact and GitHub Release asset `sbom.spdx.json` | Parse JSON and inspect package/repository metadata | implemented |
 | CycloneDX SBOM | `.github/workflows/sbom.yml`, `.github/workflows/release.yml` | PR/push CI and tagged release | CI artifact and GitHub Release asset `sbom.cdx.json` | Parse JSON and inspect component/dependency metadata | implemented |

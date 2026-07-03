@@ -18,6 +18,7 @@ GitHub Actions are pinned to commit SHAs. Human-readable tag comments are kept f
 | `anchore/sbom-action` | `v0` | `e22c389904149dbc22b58101806040fa8d37a610` |
 | `CycloneDX/gh-gomod-generate-sbom` | `v2.0.0` | `efc74245d6802c8cefd925620515442756c70d8f` |
 | `sigstore/cosign-installer` | `v4.1.2` | `6f9f17788090df1f26f669e9d70d6ae9567deba6` |
+| `fsfe/reuse-action` | `v6.0.0` | `676e2d560c9a403aa252096d99fcab3e1132b0f5` |
 
 ## Maintenance Rule
 
