@@ -242,13 +242,14 @@ make test
 make vet
 make verify
 make coverage
+make coverage-ui
 make build
 make vuln
 make snapshot-release
 ```
 
 Tests use fixtures and mock HTTP servers. They do not require network access or Steam credentials.
-`make verify` is the deterministic local gate and does not call real Steam, require network access, or require credentials. `make vuln` runs `govulncheck` separately because it may need module/security database network access.
+`make verify` is the deterministic local gate and does not call real Steam, require network access, or require credentials. It includes `make coverage-ui`, which enforces at least 80% statement coverage for the `cmd/velesmist` UI/CLI package. `make coverage` still produces repository-wide coverage artifacts without enforcing a global percentage. `make vuln` runs `govulncheck` separately because it may need module/security database network access.
 
 Contracts and audit maps:
 
