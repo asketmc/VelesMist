@@ -206,11 +206,20 @@ make test
 make lint
 make vet
 make vuln
+make verify
+make coverage
 make build
 make snapshot-release
 ```
 
 Tests use fixtures and mock HTTP servers. They do not require network access or Steam credentials.
+
+Contracts and audit maps:
+
+- [schemas/scan-report.v1.json](schemas/scan-report.v1.json)
+- [schemas/price-cache.v1.json](schemas/price-cache.v1.json)
+- [docs/QA_MAP.md](docs/QA_MAP.md)
+- [docs/ARTIFACTS.md](docs/ARTIFACTS.md)
 
 ## License
 

@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/asketmc/VelesMist/schemas/scan-report.v1.json",
+  "title": "VelesMist scan report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "steam_id",
+    "appid",
+    "contextid",
+    "currency",
+    "threshold_cents",
+    "items",
+    "candidates",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "velesmist.scan.v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "steam_id": {
+      "type": "string"
+    },
+    "appid": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contextid": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 3
+    },
+    "threshold_cents": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "appid",
+        "name",
+        "market_hash_name",
+        "count",
+        "tradable",
+        "market_url",
+        "price_status",
+        "liquidity_score",
+        "confidence",
+        "recommendation",
+        "reason_codes",
+        "candidate"
+      ],
+      "properties": {
+        "appid": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "market_hash_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tradable": {
+          "type": "boolean"
+        },
+        "market_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "price_status": {
+          "enum": [
+            "priced",
+            "missing"
+          ]
+        },
+        "buyer_price_cents": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "estimated_fee_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "seller_receive_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_buyer_price_cents": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "total_estimated_fee_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_receive_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "price_source": {
+          "type": "string"
+        },
+        "liquidity_score": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "confidence": {
+          "enum": [
+            "medium",
+            "none"
+          ]
+        },
+        "recommendation": {
+          "enum": [
+            "sell",
+            "skip",
+            "missing_price"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "candidate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "marketable_items",
+        "priced_items",
+        "missing_price_items",
+        "skipped_items",
+        "candidate_items",
+        "estimated_total_gross_cents",
+        "estimated_total_fee_cents",
+        "estimated_total_receive_cents"
+      ],
+      "properties": {
+        "marketable_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "priced_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing_price_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimated_total_gross_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimated_total_fee_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimated_total_receive_cents": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

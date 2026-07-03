@@ -4,6 +4,7 @@ version = 1
 path = [
   ".github/**",
   "docs/**",
+  "schemas/**",
   "internal/**/testdata/**",
   "README.md",
   "CHANGELOG.md",

@@ -1,0 +1,44 @@
+{
+  "schema_version": "velesmist.scan.v1",
+  "generated_at": "2026-07-03T00:00:00Z",
+  "steam_id": "76561198000000000",
+  "appid": 570,
+  "contextid": "2",
+  "currency": "USD",
+  "threshold_cents": 500,
+  "items": [
+    {
+      "appid": 570,
+      "name": "Golden Moonfall",
+      "market_hash_name": "Golden Moonfall",
+      "count": 1,
+      "tradable": true,
+      "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
+      "price_status": "priced",
+      "buyer_price_cents": 1234,
+      "estimated_fee_cents": 161,
+      "seller_receive_cents": 1073,
+      "total_buyer_price_cents": 1234,
+      "total_estimated_fee_cents": 161,
+      "total_receive_cents": 1073,
+      "liquidity_score": 0,
+      "confidence": "medium",
+      "recommendation": "auto_sell",
+      "reason_codes": [
+        "MARKETABLE"
+      ],
+      "candidate": true
+    }
+  ],
+  "candidates": [],
+  "summary": {
+    "marketable_items": 1,
+    "priced_items": 1,
+    "missing_price_items": 0,
+    "skipped_items": 0,
+    "candidate_items": 0,
+    "estimated_total_gross_cents": 0,
+    "estimated_total_fee_cents": 0,
+    "estimated_total_receive_cents": 0
+  }
+}

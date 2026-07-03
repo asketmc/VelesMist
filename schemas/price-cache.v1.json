@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/asketmc/VelesMist/schemas/price-cache.v1.json",
+  "title": "VelesMist price cache v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "currency",
+    "prices"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "velesmist.price-cache.v1"
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 3
+    },
+    "prices": {
+      "type": "object",
+      "propertyNames": {
+        "minLength": 1
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/price"
+      }
+    }
+  },
+  "$defs": {
+    "price": {
+      "type": "object",
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": [
+            "buyer_price_cents"
+          ]
+        },
+        {
+          "required": [
+            "lowest_price"
+          ]
+        },
+        {
+          "required": [
+            "median_price"
+          ]
+        }
+      ],
+      "properties": {
+        "buyer_price_cents": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "lowest_price": {
+          "type": "string",
+          "minLength": 1
+        },
+        "median_price": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

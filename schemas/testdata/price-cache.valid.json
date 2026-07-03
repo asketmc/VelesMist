@@ -1,0 +1,14 @@
+{
+  "schema_version": "velesmist.price-cache.v1",
+  "currency": "USD",
+  "prices": {
+    "Golden Moonfall": {
+      "buyer_price_cents": 1234,
+      "source": "manual"
+    },
+    "Jagged Honor | Blade": {
+      "lowest_price": "$4.50",
+      "source": "manual-steam-market-check"
+    }
+  }
+}

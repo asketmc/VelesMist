@@ -8,12 +8,15 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 	"testing"
 )
 
 var usesPattern = regexp.MustCompile(`(?m)^\s*uses:\s+(.+?)\s*$`)
 var pinnedPattern = regexp.MustCompile(`(?m)^\s*uses:\s+[^@\s]+@[0-9a-f]{40}(?:\s+#\s+.+)?\s*$`)
+var pinnedUsePattern = regexp.MustCompile(`(?m)^\s*uses:\s+([^@\s]+)@([0-9a-f]{40})(?:\s+#\s+(\S+))?\s*$`)
+var pinningDocRowPattern = regexp.MustCompile("(?m)^\\|\\s+`([^`]+)`\\s+\\|\\s+`([^`]+)`\\s+\\|\\s+`([0-9a-f]{40})`\\s+\\|$")
 
 func TestWorkflowsUsePinnedActions(t *testing.T) {
 	root := repoRoot(t)
@@ -52,6 +55,38 @@ func TestWorkflowsDeclarePermissions(t *testing.T) {
 	}
 }
 
+func TestWorkflowPinningDocsMatchWorkflows(t *testing.T) {
+	root := repoRoot(t)
+	workflowPins := workflowPins(t, root)
+	docPins := pinningDocPins(t, filepath.Join(root, "docs", "WORKFLOW_PINNING.md"))
+
+	var missing []string
+	for action, pin := range workflowPins {
+		docPin, ok := docPins[action]
+		if !ok {
+			missing = append(missing, action)
+			continue
+		}
+		if docPin.sha != pin.sha || docPin.tag != pin.tag {
+			t.Fatalf("docs/WORKFLOW_PINNING.md has stale pin for %s: got %s/%s, want %s/%s", action, docPin.tag, docPin.sha, pin.tag, pin.sha)
+		}
+	}
+	if len(missing) > 0 {
+		sort.Strings(missing)
+		t.Fatalf("docs/WORKFLOW_PINNING.md missing workflow actions: %v", missing)
+	}
+	var extra []string
+	for action := range docPins {
+		if _, ok := workflowPins[action]; !ok {
+			extra = append(extra, action)
+		}
+	}
+	if len(extra) > 0 {
+		sort.Strings(extra)
+		t.Fatalf("docs/WORKFLOW_PINNING.md lists unused workflow actions: %v", extra)
+	}
+}
+
 func TestCodeownersCoversSensitivePaths(t *testing.T) {
 	root := repoRoot(t)
 	body := readFile(t, filepath.Join(root, ".github", "CODEOWNERS"))
@@ -70,6 +105,41 @@ func TestCodeownersCoversSensitivePaths(t *testing.T) {
 			t.Fatalf("CODEOWNERS missing %s", pattern)
 		}
 	}
+}
+
+type actionPin struct {
+	tag string
+	sha string
+}
+
+func workflowPins(t *testing.T, root string) map[string]actionPin {
+	t.Helper()
+	paths, err := filepath.Glob(filepath.Join(root, ".github", "workflows", "*.yml"))
+	if err != nil {
+		t.Fatalf("glob workflows: %v", err)
+	}
+	pins := map[string]actionPin{}
+	for _, path := range paths {
+		body := readFile(t, path)
+		for _, match := range pinnedUsePattern.FindAllStringSubmatch(body, -1) {
+			action := match[1]
+			if strings.HasPrefix(action, "./") || strings.HasPrefix(action, "docker://") {
+				continue
+			}
+			pins[action] = actionPin{tag: match[3], sha: match[2]}
+		}
+	}
+	return pins
+}
+
+func pinningDocPins(t *testing.T, path string) map[string]actionPin {
+	t.Helper()
+	body := readFile(t, path)
+	pins := map[string]actionPin{}
+	for _, match := range pinningDocRowPattern.FindAllStringSubmatch(body, -1) {
+		pins[match[1]] = actionPin{tag: match[2], sha: match[3]}
+	}
+	return pins
 }
 
 func repoRoot(t *testing.T) string {

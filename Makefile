@@ -11,13 +11,15 @@ DIRTY ?= $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo dirty 
 LDFLAGS := -s -w -X $(PKG)/internal/version.Version=$(VERSION) -X $(PKG)/internal/version.Commit=$(COMMIT) -X $(PKG)/internal/version.BuildDate=$(BUILD_DATE) -X $(PKG)/internal/version.Dirty=$(DIRTY)
 GOVULNCHECK_VERSION ?= latest
 
-.PHONY: test lint vet vuln build snapshot-release clean
+.PHONY: test format lint vet vuln coverage build verify snapshot-release clean
 
 test:
 	go test ./...
 
-lint:
+format:
 	@test -z "$$(gofmt -l .)" || (gofmt -l . && exit 1)
+
+lint: format
 
 vet:
 	go vet ./...
@@ -25,8 +27,15 @@ vet:
 vuln:
 	go run golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION) ./...
 
+coverage:
+	go test -covermode=atomic -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out | tee coverage.txt
+
 build:
+	mkdir -p $(DIST)
 	CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o $(DIST)/$(APP) ./cmd/velesmist
+
+verify: format test vet build
 
 snapshot-release: clean
 	mkdir -p $(DIST)
