@@ -1,6 +1,6 @@
 # Artifact Traceability
 
-This document maps assurance and build artifacts to their producer, trigger, location, verification method, and current status. These artifacts provide evidence for controls; they are not certification claims.
+This document maps assurance and build artifacts to their producer, trigger, location, verification method, and current status. These artifacts provide control evidence for verification, attestation, and provenance.
 
 | Artifact | Producer | Trigger | Location | Verification method | Status |
 | --- | --- | --- | --- | --- | --- |
