@@ -11,9 +11,9 @@ import (
 
 func TestParseMoneyToCents(t *testing.T) {
 	tests := map[string]int64{
-		"$12.34":  1234,
-		"12,30":   1230,
-		"5":       500,
+		"$12.34":   1234,
+		"12,30":    1230,
+		"5":        500,
 		"0.99 USD": 99,
 	}
 	for input, want := range tests {
@@ -34,7 +34,7 @@ func TestAnalyzeFiltersBySellerReceiveThreshold(t *testing.T) {
 	}
 	prices := PriceMap{
 		"Golden Moonfall": {BuyerPriceCents: 1234, Source: "cache"},
-		"Cheap":          {BuyerPriceCents: 400, Source: "cache"},
+		"Cheap":           {BuyerPriceCents: 400, Source: "cache"},
 	}
 	result := Analyze(items, prices, Options{ThresholdCents: 500, FeeBasisPoints: 1500})
 	if len(result.Candidates) != 1 {
