@@ -15,7 +15,7 @@ Status values are limited to `implemented`, `partial`, `planned`, `not applicabl
 | REUSE | implemented | `REUSE.toml`, `LICENSES/MIT.txt`, SPDX headers/annotations, `.github/workflows/reuse.yml` |
 | SPDX SBOM | implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml`, `docs/ARTIFACTS.md` |
 | CycloneDX SBOM | implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml`, `docs/ARTIFACTS.md` |
-| SLSA / GitHub artifact attestations | implemented | `.github/workflows/release.yml`; `v0.1.0` artifacts verified with `gh attestation verify` |
+| SLSA / GitHub artifact attestations | implemented | `.github/workflows/release.yml`; release artifacts can be verified with `gh attestation verify` |
 | Sigstore / cosign | implemented | `.github/workflows/release.yml`; release assets include `.sigstore.json` bundles |
 | govulncheck | implemented | `.github/workflows/ci.yml`, `make vuln`; kept separate from `make verify` because local runs may need network access |
 | OSV Scanner | implemented | `.github/workflows/osv-scanner.yml` |

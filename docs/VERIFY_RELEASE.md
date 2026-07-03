@@ -2,7 +2,7 @@
 
 Use these steps to verify release artifacts from `asketmc/VelesMist`.
 
-Replace `v0.1.0` with the release tag.
+Set `TAG` to the release tag you are verifying.
 
 ## Download Artifacts
 
@@ -14,12 +14,12 @@ https://github.com/asketmc/VelesMist/releases
 
 Expected files include:
 
-- `velesmist-v0.1.0-linux-amd64.tar.gz`;
-- `velesmist-v0.1.0-linux-arm64.tar.gz`;
-- `velesmist-v0.1.0-windows-amd64.zip`;
-- `velesmist-v0.1.0-windows-arm64.zip`;
-- `velesmist-v0.1.0-darwin-amd64.tar.gz`;
-- `velesmist-v0.1.0-darwin-arm64.tar.gz`;
+- `velesmist-${TAG}-linux-amd64.tar.gz`;
+- `velesmist-${TAG}-linux-arm64.tar.gz`;
+- `velesmist-${TAG}-windows-amd64.zip`;
+- `velesmist-${TAG}-windows-arm64.zip`;
+- `velesmist-${TAG}-darwin-amd64.tar.gz`;
+- `velesmist-${TAG}-darwin-arm64.tar.gz`;
 - `SHA256SUMS.txt`;
 - `*.sigstore.json` bundles;
 - `sbom.spdx.json`;
@@ -36,7 +36,8 @@ sha256sum --check SHA256SUMS.txt
 PowerShell:
 
 ```powershell
-Get-FileHash .\velesmist-v0.1.0-windows-amd64.zip -Algorithm SHA256
+$TAG = "v0.2.0"
+Get-FileHash ".\velesmist-$TAG-windows-amd64.zip" -Algorithm SHA256
 Get-Content .\SHA256SUMS.txt
 ```
 
@@ -57,7 +58,8 @@ Repeat for individual archives when desired.
 ## Verify GitHub Artifact Attestation
 
 ```bash
-gh attestation verify velesmist-v0.1.0-linux-amd64.tar.gz --repo asketmc/VelesMist
+TAG=v0.2.0
+gh attestation verify "velesmist-${TAG}-linux-amd64.tar.gz" --repo asketmc/VelesMist
 ```
 
 This verifies the provenance connection between the artifact, workflow, and source repository.

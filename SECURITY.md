@@ -10,7 +10,9 @@
 
 ## Reporting a Vulnerability
 
-Use a private GitHub security advisory when the issue is exploitable or may expose sensitive data.
+Use GitHub private vulnerability reporting when the issue is exploitable or may expose sensitive data:
+
+https://github.com/asketmc/VelesMist/security/advisories/new
 
 Do not publish real Steam passwords, Steam Guard codes, Steam cookies, session IDs, API keys, private inventory exports, generated sell reports, or local cache files in public issues.
 

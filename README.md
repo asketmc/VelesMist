@@ -4,7 +4,7 @@
 [![CodeQL](https://github.com/asketmc/VelesMist/actions/workflows/codeql.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/codeql.yml)
 [![Dependency Review](https://github.com/asketmc/VelesMist/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/dependency-review.yml)
 [![Docs](https://github.com/asketmc/VelesMist/actions/workflows/docs.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/docs.yml)
-[![OpenSSF Scorecard](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml)
+[![Scorecard Workflow](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml)
 [![REUSE](https://github.com/asketmc/VelesMist/actions/workflows/reuse.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/reuse.yml)
 [![SBOM](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml)
 [![OSV Scanner](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml)
