@@ -13,6 +13,7 @@ This document maps assurance and build artifacts to their producer, trigger, loc
 | cosign signatures | `.github/workflows/release.yml` with `cosign sign-blob` | GitHub Release is published from a tag | GitHub Release assets as `*.sigstore.json` bundles | `cosign verify-blob --bundle <asset>.sigstore.json <asset>` | implemented |
 | `coverage.out` | `make coverage` | Developer runs coverage command | Local workspace root | `go tool cover -func=coverage.out` | implemented |
 | Coverage summary | `make coverage` | Developer runs coverage command | `coverage.txt` and terminal output | Inspect package/function summary; no global vanity threshold is enforced | implemented |
+| UI/CLI coverage gate | `make coverage-ui` / `make verify` | PR/push CI and local verification | `coverage-ui.out`, `coverage-ui.txt`, and CI logs | Confirm `cmd/velesmist` statement coverage is at least 80% | implemented |
 | Scorecard result | `.github/workflows/scorecard.yml` | Push to `main`, schedule, or branch protection change | GitHub Actions run and OpenSSF published result | Inspect workflow logs and Scorecard published output | partial |
 | CodeQL result | `.github/workflows/codeql.yml` | Push, PR, or schedule | GitHub code scanning and PR check | Review CodeQL check and code scanning alerts | implemented |
 | OSV Scanner result | `.github/workflows/osv-scanner.yml` | Push, PR, or schedule | GitHub Actions `scan` check | Inspect OSV Scanner workflow output | implemented |

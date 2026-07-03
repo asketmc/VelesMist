@@ -31,6 +31,7 @@ type uiConfig struct {
 }
 
 type uiScanFunc func(context.Context, config.ScanConfig) (report.ScanResult, error)
+type uiOpenFunc func(string) error
 
 type uiScanRequest struct {
 	SteamID    string `json:"steam_id"`
@@ -68,8 +69,15 @@ func runUI(args []string, stdout io.Writer, stderr io.Writer) int {
 	}
 	defer listener.Close()
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	return serveUI(ctx, listener, newUIHandler(scanWithConfig), cfg.Open, openBrowser, stdout, stderr)
+}
+
+func serveUI(ctx context.Context, listener net.Listener, handler http.Handler, shouldOpen bool, openBrowserFn uiOpenFunc, stdout io.Writer, stderr io.Writer) int {
 	server := &http.Server{
-		Handler:           newUIHandler(scanWithConfig),
+		Handler:           handler,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	errCh := make(chan error, 1)
@@ -79,14 +87,11 @@ func runUI(args []string, stdout io.Writer, stderr io.Writer) int {
 
 	url := "http://" + listener.Addr().String() + "/"
 	fmt.Fprintf(stdout, "VelesMist UI listening on %s\n", url)
-	if cfg.Open {
-		if err := openBrowser(url); err != nil {
+	if shouldOpen {
+		if err := openBrowserFn(url); err != nil {
 			fmt.Fprintf(stderr, "browser open failed: %v\n", err)
 		}
 	}
-
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
 
 	select {
 	case <-ctx.Done():
@@ -165,7 +170,7 @@ func handleUIScan(scan uiScanFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.Header().Set("Allow", http.MethodPost)
-			writeUIError(w, apperrors.New(apperrors.InvalidInput, "method not allowed"))
+			writeUIErrorStatus(w, http.StatusMethodNotAllowed, apperrors.New(apperrors.InvalidInput, "method not allowed"))
 			return
 		}
 		defer r.Body.Close()
@@ -234,6 +239,11 @@ func writeUIError(w http.ResponseWriter, err error) {
 	case apperrors.Upstream:
 		status = http.StatusBadGateway
 	}
+	writeUIErrorStatus(w, status, err)
+}
+
+func writeUIErrorStatus(w http.ResponseWriter, status int, err error) {
+	kind := apperrors.KindOf(err)
 	writeUIJSON(w, status, uiErrorResponse{
 		OK:       false,
 		Kind:     string(kind),
