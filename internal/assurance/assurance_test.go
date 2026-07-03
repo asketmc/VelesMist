@@ -107,6 +107,41 @@ func TestCodeownersCoversSensitivePaths(t *testing.T) {
 	}
 }
 
+func TestPullRequestTemplateCoversQAAndSecurity(t *testing.T) {
+	root := repoRoot(t)
+	body := readFile(t, filepath.Join(root, ".github", "pull_request_template.md"))
+	requiredSections := []string{
+		"## Summary",
+		"## Behavior changed?",
+		"## Output contract changed?",
+		"## Security/privacy impact?",
+		"## Tests added/updated?",
+		"## Local Validation Evidence",
+		"## Artifact/docs impact",
+		"## Breaking changes?",
+		"## Non-Goals",
+	}
+	for _, section := range requiredSections {
+		if !strings.Contains(body, section) {
+			t.Fatalf("pull request template missing section %q", section)
+		}
+	}
+
+	requiredChecklist := []string{
+		"No secrets/tokens/cookies/API keys committed",
+		"No real Steam credentials in tests",
+		"No real network dependency in unit tests",
+		"Output contract updated if JSON/table changed",
+		"README/docs updated if CLI changed",
+		"`make verify` run locally",
+	}
+	for _, item := range requiredChecklist {
+		if !strings.Contains(body, item) {
+			t.Fatalf("pull request template missing checklist item %q", item)
+		}
+	}
+}
+
 type actionPin struct {
 	tag string
 	sha string

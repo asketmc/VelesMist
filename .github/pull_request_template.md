@@ -5,19 +5,19 @@
 
 -
 
-## Behavior Changed?
+## Behavior changed?
 
 - [ ] Yes
 - [ ] No
 - Notes:
 
-## Output Contract Changed?
+## Output contract changed?
 
 - [ ] Yes
 - [ ] No
 - If yes, update `schemas/*`, `docs/contracts/*`, golden tests, and contract tests.
 
-## Security/Privacy Impact?
+## Security/privacy impact?
 
 - [ ] No new external network path
 - [ ] No new secret, token, cookie, session, or credential handling
@@ -25,7 +25,7 @@
 - [ ] Security-sensitive files have CODEOWNERS coverage
 - Notes:
 
-## Tests Added/Updated?
+## Tests added/updated?
 
 - [ ] Unit tests
 - [ ] Integration tests with mocked HTTP only
@@ -43,14 +43,14 @@
 - [ ] `make coverage`
 - [ ] `make vuln` if dependency/security risk changed or CI-only reason documented
 
-## Artifact/Docs Impact
+## Artifact/docs impact
 
 - [ ] README/docs updated if CLI or data flow changed
 - [ ] QA map / artifact map updated if evidence changed
 - [ ] Release verification docs updated if release artifacts changed
 - [ ] Not applicable
 
-## Breaking Changes?
+## Breaking changes?
 
 - [ ] Yes
 - [ ] No
@@ -67,7 +67,7 @@
 - [ ] No real network dependency in unit tests
 - [ ] Output contract updated if JSON/table changed
 - [ ] README/docs updated if CLI changed
-- [ ] `make verify` run locally or explicit reason documented
+- [ ] `make verify` run locally
 
 ## AI Disclosure
 
