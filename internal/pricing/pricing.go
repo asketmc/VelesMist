@@ -34,22 +34,25 @@ type Options struct {
 }
 
 type PricedItem struct {
-	AppID                  int    `json:"appid"`
-	Name                   string `json:"name"`
-	MarketHashName         string `json:"market_hash_name"`
-	Count                  int    `json:"count"`
-	Tradable               bool   `json:"tradable"`
-	MarketURL              string `json:"market_url"`
-	PriceStatus            string `json:"price_status"`
-	BuyerPriceCents        int64  `json:"buyer_price_cents,omitempty"`
-	EstimatedFeeCents      int64  `json:"estimated_fee_cents,omitempty"`
-	SellerReceiveCents     int64  `json:"seller_receive_cents,omitempty"`
-	TotalBuyerPriceCents   int64  `json:"total_buyer_price_cents,omitempty"`
-	TotalEstimatedFeeCents int64  `json:"total_estimated_fee_cents,omitempty"`
-	TotalReceiveCents      int64  `json:"total_receive_cents,omitempty"`
-	PriceSource            string `json:"price_source,omitempty"`
-	Recommendation         string `json:"recommendation"`
-	Candidate              bool   `json:"candidate"`
+	AppID                  int      `json:"appid"`
+	Name                   string   `json:"name"`
+	MarketHashName         string   `json:"market_hash_name"`
+	Count                  int      `json:"count"`
+	Tradable               bool     `json:"tradable"`
+	MarketURL              string   `json:"market_url"`
+	PriceStatus            string   `json:"price_status"`
+	BuyerPriceCents        int64    `json:"buyer_price_cents,omitempty"`
+	EstimatedFeeCents      int64    `json:"estimated_fee_cents,omitempty"`
+	SellerReceiveCents     int64    `json:"seller_receive_cents,omitempty"`
+	TotalBuyerPriceCents   int64    `json:"total_buyer_price_cents,omitempty"`
+	TotalEstimatedFeeCents int64    `json:"total_estimated_fee_cents,omitempty"`
+	TotalReceiveCents      int64    `json:"total_receive_cents,omitempty"`
+	PriceSource            string   `json:"price_source,omitempty"`
+	LiquidityScore         int      `json:"liquidity_score"`
+	Confidence             string   `json:"confidence"`
+	Recommendation         string   `json:"recommendation"`
+	ReasonCodes            []string `json:"reason_codes"`
+	Candidate              bool     `json:"candidate"`
 }
 
 type Analysis struct {
@@ -64,6 +67,17 @@ const (
 	RecommendationSell         = "sell"
 	RecommendationSkip         = "skip"
 	RecommendationMissingPrice = "missing_price"
+
+	ConfidenceMedium = "medium"
+	ConfidenceNone   = "none"
+
+	ReasonMarketable        = "MARKETABLE"
+	ReasonPriceFound        = "PRICE_FOUND"
+	ReasonPriceMissing      = "PRICE_MISSING"
+	ReasonBelowMinNet       = "BELOW_MIN_NET"
+	ReasonMeetsMinNet       = "MEETS_MIN_NET"
+	ReasonSteamFeeEstimated = "STEAM_FEE_ESTIMATED"
+	ReasonLiquidityUnknown  = "LIQUIDITY_UNKNOWN"
 )
 
 func LoadPriceMap(raw map[string]PriceInput) (PriceMap, error) {
@@ -106,7 +120,13 @@ func Analyze(items []inventory.AggregatedItem, prices PriceMap, opts Options) An
 			Tradable:       item.Tradable,
 			MarketURL:      MarketURL(item.AppID, item.MarketHashName),
 			PriceStatus:    PriceStatusMissing,
+			Confidence:     ConfidenceNone,
 			Recommendation: RecommendationMissingPrice,
+			ReasonCodes: []string{
+				ReasonMarketable,
+				ReasonPriceMissing,
+				ReasonLiquidityUnknown,
+			},
 		}
 		if price, ok := prices[item.MarketHashName]; ok {
 			seller := BuyerToSellerCents(price.BuyerPriceCents, opts.FeeBasisPoints)
@@ -119,11 +139,20 @@ func Analyze(items []inventory.AggregatedItem, prices PriceMap, opts Options) An
 			row.TotalEstimatedFeeCents = fee * int64(item.Count)
 			row.TotalReceiveCents = seller * int64(item.Count)
 			row.PriceSource = price.Source
+			row.Confidence = ConfidenceMedium
+			row.ReasonCodes = []string{
+				ReasonMarketable,
+				ReasonPriceFound,
+				ReasonSteamFeeEstimated,
+				ReasonLiquidityUnknown,
+			}
 			if seller >= opts.ThresholdCents {
 				row.Recommendation = RecommendationSell
+				row.ReasonCodes = append(row.ReasonCodes, ReasonMeetsMinNet)
 				row.Candidate = true
 			} else {
 				row.Recommendation = RecommendationSkip
+				row.ReasonCodes = append(row.ReasonCodes, ReasonBelowMinNet)
 			}
 		}
 		result.Items = append(result.Items, row)

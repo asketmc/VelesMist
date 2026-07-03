@@ -20,10 +20,14 @@ import (
 const (
 	FormatTable = "table"
 	FormatJSON  = "json"
+
+	GameDota2 = "dota2"
 )
 
 type ScanConfig struct {
 	SteamID        string
+	Game           string
+	FixtureFile    string
 	AppID          int
 	ContextID      string
 	Format         string
@@ -48,6 +52,8 @@ func ParseScan(args []string) (ScanConfig, error) {
 	fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	fs.StringVar(&cfg.SteamID, "steam-id", cfg.SteamID, "Steam64 ID for a public inventory")
+	fs.StringVar(&cfg.Game, "game", cfg.Game, "game preset: dota2")
+	fs.StringVar(&cfg.FixtureFile, "fixture", cfg.FixtureFile, "read Steam inventory JSON from a local fixture instead of the network")
 	fs.IntVar(&cfg.AppID, "appid", cfg.AppID, "Steam appid")
 	fs.StringVar(&cfg.ContextID, "contextid", cfg.ContextID, "Steam inventory contextid")
 	fs.StringVar(&cfg.Format, "format", cfg.Format, "output format: table or json")
@@ -88,10 +94,13 @@ func ParsePriceTemplate(args []string) (PriceTemplateConfig, error) {
 }
 
 func ValidateScan(cfg ScanConfig) error {
-	if cfg.SteamID == "" {
+	if cfg.Game != GameDota2 {
+		return apperrors.New(apperrors.InvalidInput, "game must be dota2")
+	}
+	if cfg.SteamID == "" && cfg.FixtureFile == "" {
 		return apperrors.New(apperrors.InvalidInput, "steam-id is required")
 	}
-	if !isDigits(cfg.SteamID) || len(cfg.SteamID) < 16 || len(cfg.SteamID) > 20 {
+	if cfg.SteamID != "" && (!isDigits(cfg.SteamID) || len(cfg.SteamID) < 16 || len(cfg.SteamID) > 20) {
 		return apperrors.New(apperrors.InvalidInput, "steam-id must be a numeric Steam64 ID")
 	}
 	if cfg.AppID <= 0 {
@@ -120,6 +129,7 @@ func ValidateScan(cfg ScanConfig) error {
 
 func defaultScanConfig() ScanConfig {
 	return ScanConfig{
+		Game:           GameDota2,
 		AppID:          570,
 		ContextID:      "2",
 		Format:         FormatTable,

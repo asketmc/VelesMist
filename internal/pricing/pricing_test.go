@@ -54,8 +54,17 @@ func TestAnalyzeFiltersBySellerReceiveThreshold(t *testing.T) {
 	if got.Recommendation != RecommendationSell {
 		t.Fatalf("recommendation = %s, want %s", got.Recommendation, RecommendationSell)
 	}
+	if got.Confidence != ConfidenceMedium {
+		t.Fatalf("confidence = %s, want %s", got.Confidence, ConfidenceMedium)
+	}
+	if len(got.ReasonCodes) == 0 {
+		t.Fatal("expected reason codes")
+	}
 	if result.Items[1].Recommendation != RecommendationSkip {
 		t.Fatalf("cheap recommendation = %s, want %s", result.Items[1].Recommendation, RecommendationSkip)
+	}
+	if result.Items[1].ReasonCodes[len(result.Items[1].ReasonCodes)-1] != ReasonBelowMinNet {
+		t.Fatalf("cheap reason codes = %v, want last %s", result.Items[1].ReasonCodes, ReasonBelowMinNet)
 	}
 }
 

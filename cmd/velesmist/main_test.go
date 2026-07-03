@@ -90,3 +90,26 @@ func TestScanUsesLocalCacheAndPriceCacheJSON(t *testing.T) {
 		t.Fatalf("expected market URL and fee in first item: %+v", got.Items[0])
 	}
 }
+
+func TestScanUsesFixtureWithoutNetworkOrSteamID(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	code := run([]string{
+		"scan",
+		"--fixture", filepath.Join("..", "..", "internal", "inventory", "testdata", "dota_inventory.json"),
+		"--format", "json",
+	}, &stdout, &stderr)
+	if code != errors.ExitSuccess {
+		t.Fatalf("exit=%d stderr=%s", code, stderr.String())
+	}
+	var got report.ScanResult
+	if err := json.Unmarshal(stdout.Bytes(), &got); err != nil {
+		t.Fatalf("decode scan JSON: %v\n%s", err, stdout.String())
+	}
+	if got.AppID != 570 || got.ContextID != "2" {
+		t.Fatalf("unexpected fixture report target: appid=%d contextid=%s", got.AppID, got.ContextID)
+	}
+	if got.Summary.MarketableItems != 2 || got.Summary.MissingPriceItems != 2 {
+		t.Fatalf("unexpected fixture summary: %+v", got.Summary)
+	}
+}

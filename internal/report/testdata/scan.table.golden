@@ -1,5 +1,5 @@
-ITEM                  COUNT  GROSS      FEE       YOU_RECEIVE  TOTAL      RECOMMENDATION  MARKET_URL
-Golden Moonfall       2      USD 12.34  USD 1.61  USD 10.73    USD 21.46  sell            https://steamcommunity.com/market/listings/570/Golden%20Moonfall
-Jagged Honor | Blade  1      -          -         -            -          missing_price   https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade
+ITEM                  COUNT  GROSS      FEE       YOU_RECEIVE  TOTAL      CONFIDENCE  RECOMMENDATION  REASONS                                                                     MARKET_URL
+Golden Moonfall       2      USD 12.34  USD 1.61  USD 10.73    USD 21.46  medium      sell            MARKETABLE,PRICE_FOUND,STEAM_FEE_ESTIMATED,LIQUIDITY_UNKNOWN,MEETS_MIN_NET  https://steamcommunity.com/market/listings/570/Golden%20Moonfall
+Jagged Honor | Blade  1      -          -         -            -          none        missing_price   MARKETABLE,PRICE_MISSING,LIQUIDITY_UNKNOWN                                  https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade
 
 Sell recommendations: 1 Estimated gross: USD 24.68 Estimated fees: USD 3.22 Estimated receive: USD 21.46

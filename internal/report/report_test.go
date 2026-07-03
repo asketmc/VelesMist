@@ -45,8 +45,16 @@ func testResult() ScanResult {
 			TotalEstimatedFeeCents: 322,
 			TotalReceiveCents:      2146,
 			PriceSource:            "cache",
+			Confidence:             pricing.ConfidenceMedium,
 			Recommendation:         pricing.RecommendationSell,
-			Candidate:              true,
+			ReasonCodes: []string{
+				pricing.ReasonMarketable,
+				pricing.ReasonPriceFound,
+				pricing.ReasonSteamFeeEstimated,
+				pricing.ReasonLiquidityUnknown,
+				pricing.ReasonMeetsMinNet,
+			},
+			Candidate: true,
 		},
 		{
 			AppID:          570,
@@ -56,7 +64,13 @@ func testResult() ScanResult {
 			Tradable:       true,
 			MarketURL:      "https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade",
 			PriceStatus:    pricing.PriceStatusMissing,
+			Confidence:     pricing.ConfidenceNone,
 			Recommendation: pricing.RecommendationMissingPrice,
+			ReasonCodes: []string{
+				pricing.ReasonMarketable,
+				pricing.ReasonPriceMissing,
+				pricing.ReasonLiquidityUnknown,
+			},
 		},
 	}
 	return BuildScanResult(ScanInput{

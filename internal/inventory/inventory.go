@@ -53,6 +53,10 @@ type Item struct {
 	Type           string `json:"type,omitempty"`
 }
 
+type Inventory struct {
+	Items []Item
+}
+
 type AggregatedItem struct {
 	AppID          int    `json:"appid"`
 	Name           string `json:"name"`

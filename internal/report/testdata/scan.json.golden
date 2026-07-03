@@ -22,7 +22,16 @@
       "total_estimated_fee_cents": 322,
       "total_receive_cents": 2146,
       "price_source": "cache",
+      "liquidity_score": 0,
+      "confidence": "medium",
       "recommendation": "sell",
+      "reason_codes": [
+        "MARKETABLE",
+        "PRICE_FOUND",
+        "STEAM_FEE_ESTIMATED",
+        "LIQUIDITY_UNKNOWN",
+        "MEETS_MIN_NET"
+      ],
       "candidate": true
     },
     {
@@ -33,7 +42,14 @@
       "tradable": true,
       "market_url": "https://steamcommunity.com/market/listings/570/Jagged%20Honor%20%7C%20Blade",
       "price_status": "missing",
+      "liquidity_score": 0,
+      "confidence": "none",
       "recommendation": "missing_price",
+      "reason_codes": [
+        "MARKETABLE",
+        "PRICE_MISSING",
+        "LIQUIDITY_UNKNOWN"
+      ],
       "candidate": false
     }
   ],
@@ -53,7 +69,16 @@
       "total_estimated_fee_cents": 322,
       "total_receive_cents": 2146,
       "price_source": "cache",
+      "liquidity_score": 0,
+      "confidence": "medium",
       "recommendation": "sell",
+      "reason_codes": [
+        "MARKETABLE",
+        "PRICE_FOUND",
+        "STEAM_FEE_ESTIMATED",
+        "LIQUIDITY_UNKNOWN",
+        "MEETS_MIN_NET"
+      ],
       "candidate": true
     }
   ],

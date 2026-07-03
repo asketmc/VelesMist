@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -93,7 +94,7 @@ func WriteJSON(w io.Writer, result ScanResult) error {
 
 func WriteTable(w io.Writer, result ScanResult) error {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "ITEM\tCOUNT\tGROSS\tFEE\tYOU_RECEIVE\tTOTAL\tRECOMMENDATION\tMARKET_URL")
+	fmt.Fprintln(tw, "ITEM\tCOUNT\tGROSS\tFEE\tYOU_RECEIVE\tTOTAL\tCONFIDENCE\tRECOMMENDATION\tREASONS\tMARKET_URL")
 	for _, item := range result.Items {
 		gross := "-"
 		fee := "-"
@@ -105,14 +106,16 @@ func WriteTable(w io.Writer, result ScanResult) error {
 			seller = result.Currency + " " + pricing.FormatCents(item.SellerReceiveCents)
 			total = result.Currency + " " + pricing.FormatCents(item.TotalReceiveCents)
 		}
-		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\n",
+		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			item.MarketHashName,
 			item.Count,
 			gross,
 			fee,
 			seller,
 			total,
+			item.Confidence,
 			item.Recommendation,
+			strings.Join(item.ReasonCodes, ","),
 			item.MarketURL,
 		)
 	}

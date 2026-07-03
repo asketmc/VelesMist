@@ -62,9 +62,10 @@ Release builds inject version metadata with ldflags:
 ## Usage
 
 ```bash
-velesmist scan --steam-id 76561198000000000
-velesmist scan --steam-id 76561198000000000 --format table
-velesmist scan --steam-id 76561198000000000 --format json
+velesmist scan --steam-id 76561198000000000 --game dota2
+velesmist scan --steam-id 76561198000000000 --game dota2 --format table
+velesmist scan --steam-id 76561198000000000 --game dota2 --format json
+velesmist scan --fixture internal/inventory/testdata/dota_inventory.json --format json
 velesmist prices template --output prices.json
 velesmist version
 ```
@@ -74,10 +75,13 @@ Optional price cache:
 ```bash
 velesmist scan \
   --steam-id 76561198000000000 \
+  --game dota2 \
   --format json \
   --price-cache prices.json \
   --min-price 5.00
 ```
+
+`--fixture` reads a local Steam inventory JSON file and does not contact Steam. It is intended for deterministic tests, demos, and local report-format checks.
 
 Price cache format:
 
@@ -128,7 +132,16 @@ JSON output is intended to be machine-readable and stable within the `velesmist.
       "total_estimated_fee_cents": 322,
       "total_receive_cents": 2146,
       "price_source": "manual",
+      "liquidity_score": 0,
+      "confidence": "medium",
       "recommendation": "sell",
+      "reason_codes": [
+        "MARKETABLE",
+        "PRICE_FOUND",
+        "STEAM_FEE_ESTIMATED",
+        "LIQUIDITY_UNKNOWN",
+        "MEETS_MIN_NET"
+      ],
       "candidate": true
     }
   ],
@@ -151,6 +164,8 @@ Recommendations are read-only:
 - `sell` means the estimated seller proceeds for one item meet or exceed `--min-price`;
 - `skip` means the item has a price but is below the threshold;
 - `missing_price` means no local price entry matched the item's `market_hash_name`.
+
+`confidence`, `liquidity_score`, and `reason_codes` explain why an item received that recommendation. The first version marks locally supplied prices as `medium` confidence and reports unknown liquidity as `LIQUIDITY_UNKNOWN`; live market liquidity is intentionally not implemented yet.
 
 ## Exit Codes
 
