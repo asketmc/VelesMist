@@ -20,13 +20,13 @@ This project implements controls for supply-chain and open-source hygiene. It is
 | Secret Scanning / Push Protection | Implemented in GitHub setting | Verified enabled through the GitHub repository API on 2026-07-03 |
 | REUSE compliance | Implemented | `REUSE.toml`, `LICENSES/MIT.txt`, `.github/workflows/reuse.yml` |
 | SPDX license metadata | Implemented | SPDX headers and REUSE annotations |
-| SPDX SBOM | Partial | `.github/workflows/sbom.yml` produces CI artifacts; release SBOM requires first release |
-| CycloneDX SBOM | Partial | `.github/workflows/sbom.yml` produces CI artifacts; release SBOM requires first release |
+| SPDX SBOM | Implemented | `.github/workflows/sbom.yml` produces CI artifacts; `v0.1.0` release includes `sbom.spdx.json` |
+| CycloneDX SBOM | Implemented | `.github/workflows/sbom.yml` produces CI artifacts; `v0.1.0` release includes `sbom.cdx.json` |
 | OSV Scanner | Implemented | `.github/workflows/osv-scanner.yml` |
 | govulncheck | Implemented | `Makefile`, `.github/workflows/ci.yml` |
 | Semgrep | Implemented | `.github/workflows/semgrep.yml` |
-| SLSA provenance / artifact attestations | Requires first release | `.github/workflows/release.yml` |
-| Sigstore / cosign release signing | Requires first release | `.github/workflows/release.yml` |
+| SLSA provenance / artifact attestations | Implemented | `.github/workflows/release.yml`; `v0.1.0` artifacts verified with `gh attestation verify` |
+| Sigstore / cosign release signing | Implemented | `.github/workflows/release.yml`; `v0.1.0` release includes `.sigstore.json` bundles |
 | Workflow pinning policy | Implemented | `docs/WORKFLOW_PINNING.md`, `internal/assurance` tests |
 | Security Insights metadata | Implemented | `security-insights.yml` uses OpenSSF Security Insights schema `2.2.0`; no fake contact email or unverified release claim |
 | Branch protection / required checks | Implemented in GitHub setting | Verified classic `main` branch protection through the GitHub repository API on 2026-07-03 |
@@ -62,7 +62,6 @@ Scorecard should run continuously. Promote it to a required check only after it 
 The latest observed OpenSSF Scorecard run completed successfully, but the numeric score is not yet a high-score claim. Known non-code or staged gaps:
 
 - OpenSSF Best Practices badge requires external project registration.
-- Signed release evidence requires the first GitHub release.
 - `Maintained` is temporarily low because the repository was created within the last 90 days.
 - `Contributors` is low until the project has contributors from more organizations.
 - `Code-Review` improves only through future human-reviewed PR history.

@@ -7,8 +7,7 @@ header:
   last-reviewed: 2026-07-03
   url: https://raw.githubusercontent.com/asketmc/VelesMist/main/security-insights.yml
   comment: >
-    Single-repository Security Insights metadata for VelesMist. Release-specific
-    fields are intentionally omitted until the first release exists.
+    Single-repository Security Insights metadata for VelesMist.
 
 project:
   name: VelesMist
@@ -54,6 +53,25 @@ repository:
     governance: https://github.com/asketmc/VelesMist/blob/main/.github/CODEOWNERS
     review-policy: https://github.com/asketmc/VelesMist/blob/main/.github/pull_request_template.md
     security-policy: https://github.com/asketmc/VelesMist/blob/main/SECURITY.md
+  release:
+    automated-pipeline: true
+    changelog: https://github.com/asketmc/VelesMist/releases/tag/{version}
+    distribution-points:
+      - uri: https://github.com/asketmc/VelesMist/releases
+        comment: GitHub Releases page for source and binary release artifacts.
+    attestations:
+      - name: GitHub artifact attestation / SLSA provenance
+        predicate-uri: https://slsa.dev/provenance/v1
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Verify release artifacts with `gh attestation verify --repo asketmc/VelesMist --source-ref refs/tags/{version}`.
+      - name: SPDX SBOM
+        predicate-uri: https://spdx.dev/Document
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Release assets include `sbom.spdx.json`.
+      - name: CycloneDX SBOM
+        predicate-uri: https://cyclonedx.org/schema
+        location: https://github.com/asketmc/VelesMist/releases/tag/{version}
+        comment: Release assets include `sbom.cdx.json`.
   license:
     url: https://github.com/asketmc/VelesMist/blob/main/LICENSE
     expression: MIT

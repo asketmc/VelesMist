@@ -28,7 +28,7 @@ Runtime model: one static Go binary built with `CGO_ENABLED=0`. Docker, Python, 
 
 ## Release Install
 
-No public release has been published yet. After the first release is available, download the archive for your OS and architecture from:
+Download the archive for your OS and architecture from GitHub Releases:
 
 ```text
 https://github.com/asketmc/VelesMist/releases
