@@ -4,6 +4,7 @@
 package cache
 
 import (
+	"encoding/json"
 	"path/filepath"
 	"testing"
 	"time"
@@ -25,7 +26,13 @@ func TestStoreReadWriteValidRecord(t *testing.T) {
 	if !ok {
 		t.Fatal("expected cache hit")
 	}
-	if string(got) != string(body) {
+	if !json.Valid(got) {
+		t.Fatalf("cached body is not valid JSON: %s", got)
+	}
+	if !json.Valid(body) {
+		t.Fatalf("test body is not valid JSON: %s", body)
+	}
+	if !jsonEqual(got, body) {
 		t.Fatalf("body = %s, want %s", got, body)
 	}
 }
@@ -45,4 +52,24 @@ func TestStoreExpiresRecord(t *testing.T) {
 	if ok {
 		t.Fatal("expected expired cache miss")
 	}
+}
+
+func jsonEqual(a, b []byte) bool {
+	var left any
+	var right any
+	if err := json.Unmarshal(a, &left); err != nil {
+		return false
+	}
+	if err := json.Unmarshal(b, &right); err != nil {
+		return false
+	}
+	leftBytes, err := json.Marshal(left)
+	if err != nil {
+		return false
+	}
+	rightBytes, err := json.Marshal(right)
+	if err != nil {
+		return false
+	}
+	return string(leftBytes) == string(rightBytes)
 }
