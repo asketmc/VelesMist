@@ -5,6 +5,7 @@ package steam
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -16,6 +17,8 @@ import (
 
 	apperrors "github.com/asketmc/VelesMist/internal/errors"
 )
+
+const inventoryPageSize = "250"
 
 type Client struct {
 	baseURL    string
@@ -43,6 +46,80 @@ func NewClient(opts Options) Client {
 }
 
 func (c Client) FetchInventory(ctx context.Context, steamID string, appID int, contextID string) ([]byte, error) {
+	var combined steamInventoryPage
+	var startAssetID string
+	for page := 0; page < 100; page++ {
+		body, err := c.fetchInventoryPage(ctx, steamID, appID, contextID, startAssetID)
+		if err != nil {
+			return nil, err
+		}
+		var parsed steamInventoryPage
+		if err := json.Unmarshal(body, &parsed); err != nil {
+			return nil, apperrors.Wrap(apperrors.Upstream, "decode Steam inventory page", err)
+		}
+		if len(combined.Success) == 0 {
+			combined.Success = parsed.Success
+		}
+		combined.Assets = append(combined.Assets, parsed.Assets...)
+		combined.Descriptions = append(combined.Descriptions, parsed.Descriptions...)
+		combined.TotalCount = parsed.TotalCount
+		if !bool(parsed.More) {
+			if combined.Assets == nil {
+				combined.Assets = []json.RawMessage{}
+			}
+			if combined.Descriptions == nil {
+				combined.Descriptions = []json.RawMessage{}
+			}
+			result, err := json.Marshal(combined)
+			if err != nil {
+				return nil, apperrors.Wrap(apperrors.Internal, "encode combined Steam inventory", err)
+			}
+			return result, nil
+		}
+		if parsed.LastAssetID == "" || parsed.LastAssetID == startAssetID {
+			return nil, apperrors.New(apperrors.Upstream, "Steam inventory pagination did not advance")
+		}
+		startAssetID = parsed.LastAssetID
+	}
+	return nil, apperrors.New(apperrors.Upstream, "Steam inventory pagination exceeded page limit")
+}
+
+type steamInventoryPage struct {
+	Success      json.RawMessage   `json:"success,omitempty"`
+	Assets       []json.RawMessage `json:"assets"`
+	Descriptions []json.RawMessage `json:"descriptions"`
+	TotalCount   int               `json:"total_inventory_count,omitempty"`
+	More         steamBool         `json:"more_items,omitempty"`
+	LastAssetID  string            `json:"last_assetid,omitempty"`
+}
+
+type steamBool bool
+
+func (b *steamBool) UnmarshalJSON(data []byte) error {
+	var boolean bool
+	if err := json.Unmarshal(data, &boolean); err == nil {
+		*b = steamBool(boolean)
+		return nil
+	}
+	var numeric int
+	if err := json.Unmarshal(data, &numeric); err == nil {
+		*b = steamBool(numeric != 0)
+		return nil
+	}
+	var text string
+	if err := json.Unmarshal(data, &text); err == nil {
+		switch strings.ToLower(strings.TrimSpace(text)) {
+		case "1", "true", "yes":
+			*b = true
+		default:
+			*b = false
+		}
+		return nil
+	}
+	return fmt.Errorf("invalid Steam boolean %s", string(data))
+}
+
+func (c Client) fetchInventoryPage(ctx context.Context, steamID string, appID int, contextID string, startAssetID string) ([]byte, error) {
 	endpoint, err := url.Parse(c.baseURL)
 	if err != nil {
 		return nil, apperrors.Wrap(apperrors.InvalidInput, "parse Steam base URL", err)
@@ -50,7 +127,10 @@ func (c Client) FetchInventory(ctx context.Context, steamID string, appID int, c
 	endpoint.Path = fmt.Sprintf("/inventory/%s/%d/%s", url.PathEscape(steamID), appID, url.PathEscape(contextID))
 	q := endpoint.Query()
 	q.Set("l", "english")
-	q.Set("count", "5000")
+	q.Set("count", inventoryPageSize)
+	if startAssetID != "" {
+		q.Set("start_assetid", startAssetID)
+	}
 	endpoint.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
@@ -76,8 +156,11 @@ func (c Client) FetchInventory(ctx context.Context, steamID string, appID int, c
 	if resp.StatusCode == http.StatusTooManyRequests {
 		return nil, apperrors.New(apperrors.RateLimited, "Steam rate limited the request")
 	}
-	if resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusForbidden {
-		return nil, apperrors.New(apperrors.Upstream, fmt.Sprintf("Steam inventory is private or unavailable (HTTP %d)", resp.StatusCode))
+	if resp.StatusCode == http.StatusForbidden {
+		return nil, apperrors.New(apperrors.Upstream, "Steam inventory is private or unavailable (HTTP 403)")
+	}
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, apperrors.New(apperrors.Upstream, "Steam rejected the inventory request (HTTP 400)")
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, apperrors.New(apperrors.Upstream, fmt.Sprintf("Steam returned HTTP %d", resp.StatusCode))
