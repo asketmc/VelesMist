@@ -21,6 +21,8 @@ Each `prices` entry must include at least one of:
 Optional:
 
 - `source`: human-readable source label such as `manual` or `manual-steam-market-check`.
+- `confidence`: optional metadata value. Current accepted values are `medium` and `none`; the current scorer still emits `medium` for usable local cache prices and `none` for missing prices.
+- `liquidity_score`: optional non-negative integer metadata. The current scorer still emits `0` because live liquidity is not implemented.
 
 ## Invalid Or Missing Price Behavior
 

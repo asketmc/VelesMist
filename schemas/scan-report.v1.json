@@ -2,6 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/asketmc/VelesMist/schemas/scan-report.v1.json",
   "title": "VelesMist scan report v1",
+  "description": "Stable JSON output contract for VelesMist scan reports. Items are sorted by recommendation priority, then total seller receive, buyer price, count, and market_hash_name.",
+  "$comment": "Recommendation sorting order is sell, skip, missing_price. Unpriced items use price_status=missing and recommendation=missing_price.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -36,7 +38,8 @@
     },
     "currency": {
       "type": "string",
-      "minLength": 3
+      "minLength": 3,
+      "description": "Currency label for monetary fields. VelesMist does not convert currencies in scan-report.v1; values reflect the selected/local price cache currency."
     },
     "threshold_cents": {
       "type": "integer",
@@ -87,7 +90,8 @@
         },
         "market_hash_name": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Steam market hash name used as the item identity for pricing and market URLs."
         },
         "count": {
           "type": "integer",
@@ -98,9 +102,11 @@
         },
         "market_url": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "description": "Steam Community Market URL derived from appid and market_hash_name."
         },
         "price_status": {
+          "description": "missing means no local price cache entry was found for market_hash_name.",
           "enum": [
             "priced",
             "missing"
@@ -108,15 +114,18 @@
         },
         "buyer_price_cents": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Gross buyer-facing price in cents."
         },
         "estimated_fee_cents": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Estimated platform fee for one item in cents."
         },
         "seller_receive_cents": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Estimated seller receive for one item in cents."
         },
         "total_buyer_price_cents": {
           "type": "integer",
@@ -144,6 +153,7 @@
           ]
         },
         "recommendation": {
+          "$comment": "Current emitted values are sell, skip, and missing_price. not_marketable is a planned/not-yet-implemented value and is intentionally not accepted by scan-report.v1 contract tests yet.",
           "enum": [
             "sell",
             "skip",

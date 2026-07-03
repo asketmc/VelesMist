@@ -11,14 +11,17 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "velesmist.price-cache.v1"
+      "const": "velesmist.price-cache.v1",
+      "description": "Required schema marker. Unsupported schema versions fail as invalid input."
     },
     "currency": {
       "type": "string",
-      "minLength": 3
+      "minLength": 3,
+      "description": "Currency label used for local/manual prices and report output."
     },
     "prices": {
       "type": "object",
+      "description": "Object keyed by Steam market_hash_name. Missing item keys produce missing_price scan rows.",
       "propertyNames": {
         "minLength": 1
       },
@@ -51,7 +54,8 @@
       "properties": {
         "buyer_price_cents": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Gross buyer-facing price in cents."
         },
         "lowest_price": {
           "type": "string",
@@ -63,6 +67,18 @@
         },
         "source": {
           "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "medium",
+            "none"
+          ],
+          "description": "Optional confidence metadata for future or external tooling. The current scorer treats local cache prices as medium confidence and missing prices as none."
+        },
+        "liquidity_score": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Optional liquidity metadata for future or external tooling. The current scorer emits 0 because live liquidity is not implemented."
         }
       }
     }

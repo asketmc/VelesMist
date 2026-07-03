@@ -202,17 +202,18 @@ See:
 ## Development
 
 ```bash
+make fmt-check
 make test
-make lint
 make vet
-make vuln
 make verify
 make coverage
 make build
+make vuln
 make snapshot-release
 ```
 
 Tests use fixtures and mock HTTP servers. They do not require network access or Steam credentials.
+`make verify` is the deterministic local gate and does not call real Steam, require network access, or require credentials. `make vuln` runs `govulncheck` separately because it may need module/security database network access.
 
 Contracts and audit maps:
 

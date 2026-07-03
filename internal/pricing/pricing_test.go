@@ -110,3 +110,19 @@ func TestLoadPriceCacheRejectsWrongSchema(t *testing.T) {
 		t.Fatal("expected schema error")
 	}
 }
+
+func TestLoadPriceCacheRejectsInvalidOptionalMetadata(t *testing.T) {
+	input := `{
+	  "schema_version": "velesmist.price-cache.v1",
+	  "currency": "USD",
+	  "prices": {
+	    "Golden Moonfall": {
+	      "buyer_price_cents": 1234,
+	      "confidence": "certain"
+	    }
+	  }
+	}`
+	if _, _, err := LoadPriceCache(strings.NewReader(input)); err == nil {
+		t.Fatal("expected invalid confidence error")
+	}
+}

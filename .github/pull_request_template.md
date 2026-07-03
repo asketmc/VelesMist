@@ -3,43 +3,71 @@
 
 ## Summary
 
-- 
+-
 
-## Product Behavior
+## Behavior Changed?
 
-- [ ] Product behavior changed
-- [ ] Product behavior unchanged
-- If changed, describe the user-visible behavior:
+- [ ] Yes
+- [ ] No
+- Notes:
 
-## Output Contract
+## Output Contract Changed?
 
-- [ ] JSON/table output contract changed
-- [ ] JSON/table output contract unchanged
-- If changed, update `schemas/*`, golden tests, and contract docs.
+- [ ] Yes
+- [ ] No
+- If yes, update `schemas/*`, `docs/contracts/*`, golden tests, and contract tests.
 
-## Security / Privacy Impact
+## Security/Privacy Impact?
 
 - [ ] No new external network path
 - [ ] No new secret, token, cookie, session, or credential handling
-- [ ] Privacy docs updated when data flow changes
+- [ ] Privacy/security docs updated when data flow changes
 - [ ] Security-sensitive files have CODEOWNERS coverage
+- Notes:
 
-## Validation
+## Tests Added/Updated?
 
-- [ ] `make verify`
+- [ ] Unit tests
+- [ ] Integration tests with mocked HTTP only
+- [ ] Golden/contract tests
+- [ ] Not applicable
+- Notes:
+
+## Local Validation Evidence
+
+- [ ] `make fmt-check`
 - [ ] `make test`
-- [ ] `make lint`
 - [ ] `make vet`
+- [ ] `make build`
+- [ ] `make verify`
 - [ ] `make coverage`
-- [ ] `make vuln` if dependency/security risk changed
-- [ ] Docs updated for user-visible behavior changes
-- [ ] GitHub checks are green
+- [ ] `make vuln` if dependency/security risk changed or CI-only reason documented
 
-## Safety
+## Artifact/Docs Impact
 
-- [ ] No Steam credentials, cookies, session IDs, API keys, private inventory exports, generated sell reports, or local cache files are included
-- [ ] No auto-listing, auto-selling, or Steam Guard automation is introduced
-- [ ] No browser automation, scraping, prediction/ML, or Docker runtime is introduced
+- [ ] README/docs updated if CLI or data flow changed
+- [ ] QA map / artifact map updated if evidence changed
+- [ ] Release verification docs updated if release artifacts changed
+- [ ] Not applicable
+
+## Breaking Changes?
+
+- [ ] Yes
+- [ ] No
+- Notes:
+
+## Non-Goals
+
+-
+
+## Checklist
+
+- [ ] No secrets/tokens/cookies/API keys committed
+- [ ] No real Steam credentials in tests
+- [ ] No real network dependency in unit tests
+- [ ] Output contract updated if JSON/table changed
+- [ ] README/docs updated if CLI changed
+- [ ] `make verify` run locally or explicit reason documented
 
 ## AI Disclosure
 

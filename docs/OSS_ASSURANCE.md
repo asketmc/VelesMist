@@ -2,36 +2,35 @@
 
 This project implements controls for supply-chain and open-source hygiene. It is not certified secure and has not undergone a formal external audit.
 
+Status values are limited to `implemented`, `partial`, `planned`, `not applicable`, `requires GitHub setting`, and `requires first release`.
+
 | Control | Status | Evidence |
 | --- | --- | --- |
-| OpenSSF Scorecard | Partial | `.github/workflows/scorecard.yml`; latest observed score should be read from published Scorecard output, not inferred from the workflow badge |
-| GitHub Actions CI | Implemented | `.github/workflows/ci.yml` |
-| CodeQL | Implemented | `.github/workflows/codeql.yml` |
-| Dependabot | Implemented | `.github/dependabot.yml` |
-| Dependency Review | Implemented | `.github/workflows/dependency-review.yml` |
-| Docs checks | Implemented | `.github/workflows/docs.yml`, `internal/assurance` |
-| Local verification gate | Implemented | `make verify` runs format, tests, vet, and CGO-free build |
-| Coverage output | Implemented | `make coverage` produces `coverage.out` and `coverage.txt` locally |
-| Output contracts | Implemented | `schemas/scan-report.v1.json`, `schemas/price-cache.v1.json`, `internal/contracts` tests |
-| QA evidence map | Implemented | `docs/QA_MAP.md` |
-| Artifact traceability | Implemented | `docs/ARTIFACTS.md`, `docs/VERIFY_RELEASE.md` |
-| Secret Scanning / Push Protection | Implemented | Enabled in GitHub repository settings |
-| REUSE compliance | Implemented | `REUSE.toml`, `LICENSES/MIT.txt`, `.github/workflows/reuse.yml` |
-| SPDX license metadata | Implemented | SPDX headers and REUSE annotations |
-| SPDX SBOM | Implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml` |
-| CycloneDX SBOM | Implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml` |
-| OSV Scanner | Implemented | `.github/workflows/osv-scanner.yml` |
-| govulncheck | Implemented | `Makefile`, `.github/workflows/ci.yml` |
-| Semgrep | Implemented | `.github/workflows/semgrep.yml` |
-| SLSA provenance / artifact attestations | Implemented | `.github/workflows/release.yml`; `v0.1.0` artifacts verified with `gh attestation verify` |
-| Sigstore / cosign release signing | Implemented | `.github/workflows/release.yml`; `v0.1.0` release includes `.sigstore.json` bundles |
-| Workflow pinning policy | Implemented | `docs/WORKFLOW_PINNING.md`, `internal/assurance` tests |
-| Security Insights metadata | Implemented | `security-insights.yml` uses OpenSSF Security Insights schema `2.2.0`; no fake contact email or unverified release claim |
-| Branch protection / required checks | Implemented | `main` branch protection and `docs/REPOSITORY_RULESET.md` |
-| CODEOWNERS review control | Implemented | `.github/CODEOWNERS`, enforced by `main` branch protection |
-| Docker image / container scan | Not applicable | No container distribution strategy |
-| SonarCloud / Codecov / FOSSA / Snyk | Not planned | Avoid external SaaS badges without a concrete need |
-| Renovate | Not planned | Dependabot is the selected dependency bot |
+| OpenSSF Scorecard | partial | `.github/workflows/scorecard.yml`; the README badge is workflow status, not a numeric score claim |
+| CI | implemented | `.github/workflows/ci.yml`; `make verify`, govulncheck, and version smoke run in CI |
+| CodeQL | implemented | `.github/workflows/codeql.yml`; Go analysis runs on PR/push/schedule |
+| Dependabot | implemented | `.github/dependabot.yml` for GitHub Actions and Go modules |
+| Dependency Review | implemented | `.github/workflows/dependency-review.yml`; PR-only dependency/license review |
+| Secret scanning / push protection | implemented | GitHub repository settings report secret scanning and push protection enabled |
+| REUSE | implemented | `REUSE.toml`, `LICENSES/MIT.txt`, SPDX headers/annotations, `.github/workflows/reuse.yml` |
+| SPDX SBOM | implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml`, `docs/ARTIFACTS.md` |
+| CycloneDX SBOM | implemented | `.github/workflows/sbom.yml`, `.github/workflows/release.yml`, `docs/ARTIFACTS.md` |
+| SLSA / GitHub artifact attestations | implemented | `.github/workflows/release.yml`; `v0.1.0` artifacts verified with `gh attestation verify` |
+| Sigstore / cosign | implemented | `.github/workflows/release.yml`; release assets include `.sigstore.json` bundles |
+| govulncheck | implemented | `.github/workflows/ci.yml`, `make vuln`; kept separate from `make verify` because local runs may need network access |
+| OSV Scanner | implemented | `.github/workflows/osv-scanner.yml` |
+| Semgrep | implemented | `.github/workflows/semgrep.yml` |
+| workflow pinning | implemented | Workflows use commit SHA pins; `docs/WORKFLOW_PINNING.md`; `internal/assurance` tests check pinning and documentation sync |
+| Security Insights | implemented | `security-insights.yml` uses OpenSSF Security Insights schema `2.2.0` and avoids placeholder contact data |
+| CODEOWNERS | implemented | `.github/CODEOWNERS` covers workflows, dependencies, security docs, release docs, and assurance metadata |
+| branch protection | implemented | `main` requires PR review, CODEOWNERS review, required checks, blocks force-push, blocks deletion, and enforces admins |
+| QA_MAP | implemented | `docs/QA_MAP.md` maps requirements and risks to test evidence |
+| ARTIFACTS | implemented | `docs/ARTIFACTS.md` maps artifacts to producers and verification methods |
+| output schemas/contracts | implemented | `schemas/scan-report.v1.json`, `schemas/price-cache.v1.json`, `docs/contracts/*`, `internal/contracts` tests |
+| release verification docs | implemented | `docs/VERIFY_RELEASE.md` documents checksum, cosign bundle, attestation/provenance, and SBOM verification |
+| Docker image / container scan | not applicable | No container distribution strategy |
+| SonarCloud / Codecov / Coveralls / FOSSA / Snyk | not applicable | External SaaS badges are intentionally not used for this project slice |
+| Renovate | not applicable | Dependabot is the selected dependency bot |
 
 ## Runtime Dependency Position
 

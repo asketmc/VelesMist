@@ -19,6 +19,8 @@ type PriceInput struct {
 	LowestPrice     string `json:"lowest_price,omitempty"`
 	MedianPrice     string `json:"median_price,omitempty"`
 	Source          string `json:"source,omitempty"`
+	Confidence      string `json:"confidence,omitempty"`
+	LiquidityScore  int    `json:"liquidity_score,omitempty"`
 }
 
 type Price struct {
@@ -83,6 +85,12 @@ const (
 func LoadPriceMap(raw map[string]PriceInput) (PriceMap, error) {
 	prices := make(PriceMap, len(raw))
 	for name, input := range raw {
+		if input.Confidence != "" && input.Confidence != ConfidenceMedium && input.Confidence != ConfidenceNone {
+			return nil, apperrors.New(apperrors.InvalidInput, "invalid confidence for "+name)
+		}
+		if input.LiquidityScore < 0 {
+			return nil, apperrors.New(apperrors.InvalidInput, "invalid liquidity_score for "+name)
+		}
 		cents := input.BuyerPriceCents
 		var err error
 		if cents == 0 && input.LowestPrice != "" {

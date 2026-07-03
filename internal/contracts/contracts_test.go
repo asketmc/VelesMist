@@ -65,6 +65,7 @@ func TestPriceCacheFixtureMatchesContractAndLoader(t *testing.T) {
 func TestPriceCacheInvalidFixturesFailContract(t *testing.T) {
 	for _, path := range []string{
 		"schemas/testdata/price-cache.invalid-schema.json",
+		"schemas/testdata/price-cache.invalid-missing-fields.json",
 		"schemas/testdata/price-cache.invalid-missing-price.json",
 	} {
 		var cache map[string]any
@@ -76,6 +77,20 @@ func TestPriceCacheInvalidFixturesFailContract(t *testing.T) {
 }
 
 func validateScanReport(report map[string]any) error {
+	if err := rejectUnknownKeys(report,
+		"schema_version",
+		"generated_at",
+		"steam_id",
+		"appid",
+		"contextid",
+		"currency",
+		"threshold_cents",
+		"items",
+		"candidates",
+		"summary",
+	); err != nil {
+		return err
+	}
 	required := []string{
 		"schema_version",
 		"generated_at",
@@ -133,6 +148,18 @@ func validateScanReport(report map[string]any) error {
 	if !ok {
 		return fmt.Errorf("summary must be an object")
 	}
+	if err := rejectUnknownKeys(summary,
+		"marketable_items",
+		"priced_items",
+		"missing_price_items",
+		"skipped_items",
+		"candidate_items",
+		"estimated_total_gross_cents",
+		"estimated_total_fee_cents",
+		"estimated_total_receive_cents",
+	); err != nil {
+		return err
+	}
 	return requireNumberKeys(summary,
 		"marketable_items",
 		"priced_items",
@@ -146,6 +173,29 @@ func validateScanReport(report map[string]any) error {
 }
 
 func validateScanItem(item map[string]any) error {
+	if err := rejectUnknownKeys(item,
+		"appid",
+		"name",
+		"market_hash_name",
+		"count",
+		"tradable",
+		"market_url",
+		"price_status",
+		"buyer_price_cents",
+		"estimated_fee_cents",
+		"seller_receive_cents",
+		"total_buyer_price_cents",
+		"total_estimated_fee_cents",
+		"total_receive_cents",
+		"price_source",
+		"liquidity_score",
+		"confidence",
+		"recommendation",
+		"reason_codes",
+		"candidate",
+	); err != nil {
+		return err
+	}
 	if err := requireKeys(item,
 		"appid",
 		"name",
@@ -216,6 +266,9 @@ func validateScanItem(item map[string]any) error {
 }
 
 func validatePriceCache(cache map[string]any) error {
+	if err := rejectUnknownKeys(cache, "schema_version", "currency", "prices"); err != nil {
+		return err
+	}
 	if err := requireKeys(cache, "schema_version", "currency", "prices"); err != nil {
 		return err
 	}
@@ -250,6 +303,8 @@ func validatePriceEntry(price map[string]any) error {
 		"lowest_price":      true,
 		"median_price":      true,
 		"source":            true,
+		"confidence":        true,
+		"liquidity_score":   true,
 	}
 	for key := range price {
 		if !allowed[key] {
@@ -269,6 +324,19 @@ func validatePriceEntry(price map[string]any) error {
 			hasPrice = true
 		}
 	}
+	if confidence := stringField(price, "confidence"); confidence != "" {
+		switch confidence {
+		case "medium", "none":
+		default:
+			return fmt.Errorf("invalid confidence %q", confidence)
+		}
+	}
+	if raw, ok := price["liquidity_score"]; ok {
+		value, ok := raw.(float64)
+		if !ok || value < 0 || value != float64(int64(value)) {
+			return fmt.Errorf("liquidity_score must be a non-negative integer")
+		}
+	}
 	if !hasPrice {
 		return fmt.Errorf("one of buyer_price_cents, lowest_price, or median_price is required")
 	}
@@ -279,6 +347,19 @@ func requireKeys(object map[string]any, keys ...string) error {
 	for _, key := range keys {
 		if _, ok := object[key]; !ok {
 			return fmt.Errorf("missing required key %q", key)
+		}
+	}
+	return nil
+}
+
+func rejectUnknownKeys(object map[string]any, keys ...string) error {
+	allowed := make(map[string]bool, len(keys))
+	for _, key := range keys {
+		allowed[key] = true
+	}
+	for key := range object {
+		if !allowed[key] {
+			return fmt.Errorf("unknown field %q", key)
 		}
 	}
 	return nil
