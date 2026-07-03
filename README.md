@@ -4,7 +4,7 @@
 [![CodeQL](https://github.com/asketmc/VelesMist/actions/workflows/codeql.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/codeql.yml)
 [![Dependency Review](https://github.com/asketmc/VelesMist/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/dependency-review.yml)
 [![Docs](https://github.com/asketmc/VelesMist/actions/workflows/docs.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/docs.yml)
-[![OpenSSF Scorecard](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml)
+[![Scorecard Workflow](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/scorecard.yml)
 [![REUSE](https://github.com/asketmc/VelesMist/actions/workflows/reuse.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/reuse.yml)
 [![SBOM](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml)
 [![OSV Scanner](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml)
@@ -26,9 +26,9 @@ Release builds target:
 
 Runtime model: one static Go binary built with `CGO_ENABLED=0`. Docker, Python, JVM, Node, and Electron are not required at runtime.
 
-## Install From Releases
+## Release Install
 
-After the first release is published, download the archive for your OS and architecture from:
+No public release has been published yet. After the first release is available, download the archive for your OS and architecture from:
 
 ```text
 https://github.com/asketmc/VelesMist/releases
