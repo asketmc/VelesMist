@@ -27,7 +27,7 @@ func main() {
 
 func run(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprintln(stderr, "usage: velesmist <scan|prices|version> [options]")
+		fmt.Fprintln(stderr, "usage: velesmist <scan|prices|ui|version> [options]")
 		return apperrors.ExitInvalidInput
 	}
 
@@ -38,6 +38,8 @@ func run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runScan(args[1:], stdout, stderr)
 	case "prices":
 		return runPrices(args[1:], stdout, stderr)
+	case "ui":
+		return runUI(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "unknown command: %s\n", args[0])
 		return apperrors.ExitInvalidInput
@@ -60,7 +62,22 @@ func runScan(args []string, stdout io.Writer, stderr io.Writer) int {
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
 	defer cancel()
 
-	result, err := newScanner(cfg).Scan(ctx, domain.ScanRequest{
+	result, err := scanWithConfig(ctx, cfg)
+	if err != nil {
+		fmt.Fprintf(stderr, "scan failed: %v\n", err)
+		return apperrors.ExitCode(err)
+	}
+
+	if err := writeScanResult(stdout, cfg.Format, result); err != nil {
+		fmt.Fprintf(stderr, "report failed: %v\n", err)
+		return apperrors.ExitCode(err)
+	}
+
+	return apperrors.ExitSuccess
+}
+
+func scanWithConfig(ctx context.Context, cfg config.ScanConfig) (report.ScanResult, error) {
+	return newScanner(cfg).Scan(ctx, domain.ScanRequest{
 		Inventory: domain.InventoryRequest{
 			SteamID:   cfg.SteamID,
 			Game:      cfg.Game,
@@ -75,25 +92,17 @@ func runScan(args []string, stdout io.Writer, stderr io.Writer) int {
 		ThresholdCents: cfg.MinPriceCents,
 		FeeBasisPoints: cfg.FeeBasisPoints,
 	})
-	if err != nil {
-		fmt.Fprintf(stderr, "scan failed: %v\n", err)
-		return apperrors.ExitCode(err)
-	}
+}
 
-	switch cfg.Format {
+func writeScanResult(stdout io.Writer, format string, result report.ScanResult) error {
+	switch format {
 	case config.FormatJSON:
-		err = report.WriteJSON(stdout, result)
+		return report.WriteJSON(stdout, result)
 	case config.FormatTable:
-		err = report.WriteTable(stdout, result)
+		return report.WriteTable(stdout, result)
 	default:
-		err = apperrors.New(apperrors.InvalidInput, "unsupported output format")
+		return apperrors.New(apperrors.InvalidInput, "unsupported output format")
 	}
-	if err != nil {
-		fmt.Fprintf(stderr, "report failed: %v\n", err)
-		return apperrors.ExitCode(err)
-	}
-
-	return apperrors.ExitSuccess
 }
 
 func newScanner(cfg config.ScanConfig) app.Scanner {

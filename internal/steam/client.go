@@ -76,6 +76,9 @@ func (c Client) FetchInventory(ctx context.Context, steamID string, appID int, c
 	if resp.StatusCode == http.StatusTooManyRequests {
 		return nil, apperrors.New(apperrors.RateLimited, "Steam rate limited the request")
 	}
+	if resp.StatusCode == http.StatusBadRequest || resp.StatusCode == http.StatusForbidden {
+		return nil, apperrors.New(apperrors.Upstream, fmt.Sprintf("Steam inventory is private or unavailable (HTTP %d)", resp.StatusCode))
+	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return nil, apperrors.New(apperrors.Upstream, fmt.Sprintf("Steam returned HTTP %d", resp.StatusCode))
 	}
