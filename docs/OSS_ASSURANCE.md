@@ -22,8 +22,8 @@ Status values are limited to `implemented`, `partial`, `planned`, `not applicabl
 | Semgrep | implemented | `.github/workflows/semgrep.yml` |
 | workflow pinning | implemented | Workflows use commit SHA pins; `docs/WORKFLOW_PINNING.md`; `internal/assurance` tests check pinning and documentation sync |
 | Security Insights | implemented | `security-insights.yml` uses OpenSSF Security Insights schema `2.2.0` and avoids placeholder contact data |
-| CODEOWNERS | implemented | `.github/CODEOWNERS` covers workflows, dependencies, security docs, release docs, and assurance metadata |
-| branch protection | implemented | `main` requires PR review, CODEOWNERS review, required checks, blocks force-push, blocks deletion, and enforces admins |
+| CODEOWNERS | implemented | `.github/CODEOWNERS` documents ownership for sensitive paths; required CODEOWNERS approval is not enforced in solo-maintainer mode |
+| branch protection | implemented | `main` requires PR-based flow with required checks, conversation resolution, linear history, blocks force-push, blocks deletion, and enforces admins; approval count is `0` for solo-maintainer mode |
 | QA_MAP | implemented | `docs/QA_MAP.md` maps requirements and risks to test evidence |
 | ARTIFACTS | implemented | `docs/ARTIFACTS.md` maps artifacts to producers and verification methods |
 | output schemas/contracts | implemented | `schemas/scan-report.v1.json`, `schemas/price-cache.v1.json`, `docs/contracts/*`, `internal/contracts` tests |
