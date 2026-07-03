@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	ExitSuccess     = 0
-	ExitInternal    = 1
+	ExitSuccess      = 0
+	ExitInternal     = 1
 	ExitInvalidInput = 2
-	ExitUpstream    = 3
+	ExitUpstream     = 3
 )
 
 type Kind string

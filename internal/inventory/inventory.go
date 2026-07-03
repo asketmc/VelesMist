@@ -12,12 +12,12 @@ import (
 )
 
 type SteamInventory struct {
-	Success      json.RawMessage     `json:"success"`
-	Assets       []SteamAsset        `json:"assets"`
-	Descriptions []SteamDescription  `json:"descriptions"`
-	TotalCount   int                 `json:"total_inventory_count,omitempty"`
-	More         bool                `json:"more_items,omitempty"`
-	LastAssetID  string              `json:"last_assetid,omitempty"`
+	Success      json.RawMessage    `json:"success"`
+	Assets       []SteamAsset       `json:"assets"`
+	Descriptions []SteamDescription `json:"descriptions"`
+	TotalCount   int                `json:"total_inventory_count,omitempty"`
+	More         bool               `json:"more_items,omitempty"`
+	LastAssetID  string             `json:"last_assetid,omitempty"`
 }
 
 type SteamAsset struct {
