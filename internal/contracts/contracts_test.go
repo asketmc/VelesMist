@@ -5,6 +5,8 @@ package contracts
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -30,7 +32,7 @@ func TestSchemaFilesAreJSON(t *testing.T) {
 	}
 }
 
-func TestScanReportGoldenMatchesContract(t *testing.T) {
+func TestGoldenJSONScanOutputConformsToScanReportV1(t *testing.T) {
 	var report map[string]any
 	readJSON(t, "internal/report/testdata/scan.json.golden", &report)
 	if err := validateScanReport(report); err != nil {
@@ -38,15 +40,21 @@ func TestScanReportGoldenMatchesContract(t *testing.T) {
 	}
 }
 
-func TestScanReportInvalidFixtureFailsContract(t *testing.T) {
-	var report map[string]any
-	readJSON(t, "schemas/testdata/scan-report.invalid-recommendation.json", &report)
-	if err := validateScanReport(report); err == nil {
-		t.Fatal("expected invalid scan report fixture to fail")
+func TestGoldenJSONScanOutputRemainsStable(t *testing.T) {
+	const wantSHA256 = "7f38c41d5e0020d5fda0aa33040bfe531d26c541ae47e8348a83b49b67fa0201"
+
+	body := readFile(t, "internal/report/testdata/scan.json.golden")
+	sum := sha256.Sum256(body)
+	if got := hex.EncodeToString(sum[:]); got != wantSHA256 {
+		t.Fatalf("scan JSON golden changed: got sha256 %s, want %s", got, wantSHA256)
 	}
 }
 
-func TestPriceCacheFixtureMatchesContractAndLoader(t *testing.T) {
+func TestUnknownRecommendationValueFailsScanReportV1(t *testing.T) {
+	assertScanReportFixtureFailsContract(t, "schemas/testdata/scan-report.invalid-recommendation.json")
+}
+
+func TestPriceCacheFixtureConformsToPriceCacheV1(t *testing.T) {
 	body := readFile(t, "schemas/testdata/price-cache.valid.json")
 	var cache map[string]any
 	decodeJSON(t, "schemas/testdata/price-cache.valid.json", body, &cache)
@@ -62,18 +70,16 @@ func TestPriceCacheFixtureMatchesContractAndLoader(t *testing.T) {
 	}
 }
 
-func TestPriceCacheInvalidFixturesFailContract(t *testing.T) {
-	for _, path := range []string{
-		"schemas/testdata/price-cache.invalid-schema.json",
-		"schemas/testdata/price-cache.invalid-missing-fields.json",
-		"schemas/testdata/price-cache.invalid-missing-price.json",
-	} {
-		var cache map[string]any
-		readJSON(t, path, &cache)
-		if err := validatePriceCache(cache); err == nil {
-			t.Fatalf("%s should fail price cache contract", path)
-		}
-	}
+func TestInvalidPriceCacheSchemaVersionFailsPriceCacheV1(t *testing.T) {
+	assertPriceCacheFixtureFailsContract(t, "schemas/testdata/price-cache.invalid-schema.json")
+}
+
+func TestMissingRequiredPriceCacheFieldsFailPriceCacheV1(t *testing.T) {
+	assertPriceCacheFixtureFailsContract(t, "schemas/testdata/price-cache.invalid-missing-fields.json")
+}
+
+func TestMissingRequiredPriceFieldsFailPriceCacheV1(t *testing.T) {
+	assertPriceCacheFixtureFailsContract(t, "schemas/testdata/price-cache.invalid-missing-price.json")
 }
 
 func validateScanReport(report map[string]any) error {
@@ -369,6 +375,24 @@ func validatePriceEntry(price map[string]any) error {
 		return fmt.Errorf("one of buyer_price_cents, lowest_price, or median_price is required")
 	}
 	return nil
+}
+
+func assertScanReportFixtureFailsContract(t *testing.T, path string) {
+	t.Helper()
+	var report map[string]any
+	readJSON(t, path, &report)
+	if err := validateScanReport(report); err == nil {
+		t.Fatalf("%s should fail scan report contract", path)
+	}
+}
+
+func assertPriceCacheFixtureFailsContract(t *testing.T, path string) {
+	t.Helper()
+	var cache map[string]any
+	readJSON(t, path, &cache)
+	if err := validatePriceCache(cache); err == nil {
+		t.Fatalf("%s should fail price cache contract", path)
+	}
 }
 
 func requireKeys(object map[string]any, keys ...string) error {
