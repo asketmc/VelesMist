@@ -7,6 +7,7 @@ VelesMist is a local read-only CLI.
 - Steam64 ID supplied with `--steam-id`.
 - Public Steam inventory metadata returned by Steam Community.
 - Optional local price cache supplied with `--price-cache`.
+- Optional local Steam inventory fixture supplied with `--fixture`.
 - Local inventory cache file when caching is enabled.
 
 ## Data Saved Locally
@@ -20,6 +21,8 @@ Inventory HTTP responses may be cached as JSON.
 - TTL: `--cache-ttl`.
 
 Delete the cache file to remove local cached data.
+
+The optional `velesmist.price-cache.v1` price cache is supplied by the operator and stays local. It is read from the path passed with `--price-cache`; VelesMist does not upload it or use it to call a pricing provider.
 
 ## Data Sent To External APIs
 

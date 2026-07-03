@@ -5,14 +5,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"time"
 
-	"github.com/asketmc/VelesMist/internal/cache"
+	"github.com/asketmc/VelesMist/internal/app"
 	"github.com/asketmc/VelesMist/internal/config"
+	"github.com/asketmc/VelesMist/internal/domain"
 	apperrors "github.com/asketmc/VelesMist/internal/errors"
 	"github.com/asketmc/VelesMist/internal/inventory"
 	"github.com/asketmc/VelesMist/internal/pricing"
@@ -27,7 +27,7 @@ func main() {
 
 func run(args []string, stdout io.Writer, stderr io.Writer) int {
 	if len(args) == 0 {
-		fmt.Fprintln(stderr, "usage: velesmist <scan|version> [options]")
+		fmt.Fprintln(stderr, "usage: velesmist <scan|prices|version> [options]")
 		return apperrors.ExitInvalidInput
 	}
 
@@ -36,6 +36,8 @@ func run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runVersion(stdout)
 	case "scan":
 		return runScan(args[1:], stdout, stderr)
+	case "prices":
+		return runPrices(args[1:], stdout, stderr)
 	default:
 		fmt.Fprintf(stderr, "unknown command: %s\n", args[0])
 		return apperrors.ExitInvalidInput
@@ -55,43 +57,28 @@ func runScan(args []string, stdout io.Writer, stderr io.Writer) int {
 		return apperrors.ExitCode(err)
 	}
 
-	priceMap, err := loadPrices(cfg.PriceCache)
-	if err != nil {
-		fmt.Fprintf(stderr, "invalid price cache: %v\n", err)
-		return apperrors.ExitCode(err)
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), cfg.Timeout)
 	defer cancel()
 
-	payload, err := fetchInventory(ctx, cfg)
+	result, err := newScanner(cfg).Scan(ctx, domain.ScanRequest{
+		Inventory: domain.InventoryRequest{
+			SteamID:   cfg.SteamID,
+			Game:      cfg.Game,
+			AppID:     cfg.AppID,
+			ContextID: cfg.ContextID,
+		},
+		Prices: domain.PriceRequest{
+			Path:     cfg.PriceCache,
+			Currency: cfg.Currency,
+		},
+		Currency:       cfg.Currency,
+		ThresholdCents: cfg.MinPriceCents,
+		FeeBasisPoints: cfg.FeeBasisPoints,
+	})
 	if err != nil {
 		fmt.Fprintf(stderr, "scan failed: %v\n", err)
 		return apperrors.ExitCode(err)
 	}
-
-	parsed, err := inventory.ParseSteamInventory(payload)
-	if err != nil {
-		fmt.Fprintf(stderr, "inventory parse failed: %v\n", err)
-		return apperrors.ExitCode(err)
-	}
-
-	aggregated := inventory.AggregateMarketable(parsed)
-	analysis := pricing.Analyze(aggregated, priceMap, pricing.Options{
-		ThresholdCents: cfg.MinPriceCents,
-		FeeBasisPoints: cfg.FeeBasisPoints,
-	})
-
-	result := report.BuildScanResult(report.ScanInput{
-		SteamID:        cfg.SteamID,
-		AppID:          cfg.AppID,
-		ContextID:      cfg.ContextID,
-		Currency:       cfg.Currency,
-		ThresholdCents: cfg.MinPriceCents,
-		GeneratedAt:    time.Now().UTC(),
-		Items:          analysis.Items,
-		Candidates:     analysis.Candidates,
-	})
 
 	switch cfg.Format {
 	case config.FormatJSON:
@@ -109,46 +96,64 @@ func runScan(args []string, stdout io.Writer, stderr io.Writer) int {
 	return apperrors.ExitSuccess
 }
 
-func fetchInventory(ctx context.Context, cfg config.ScanConfig) ([]byte, error) {
-	cacheKey := cache.InventoryKey(cfg.SteamID, cfg.AppID, cfg.ContextID)
-	store := cache.NewStore(cfg.CacheFile)
-	if !cfg.NoCache {
-		if body, ok, err := store.GetValid(cacheKey, time.Now().UTC()); err == nil && ok {
-			return body, nil
-		}
+func newScanner(cfg config.ScanConfig) app.Scanner {
+	var inventoryProvider app.InventoryProvider
+	if cfg.FixtureFile != "" {
+		inventoryProvider = inventory.NewFixtureProvider(cfg.FixtureFile)
+	} else {
+		inventoryProvider = steam.NewInventoryProvider(steam.InventoryProviderOptions{
+			Client: steam.NewClient(steam.Options{
+				BaseURL: cfg.SteamBaseURL,
+				Timeout: cfg.Timeout,
+			}),
+			CacheFile: cfg.CacheFile,
+			CacheTTL:  cfg.CacheTTL,
+			NoCache:   cfg.NoCache,
+		})
 	}
-
-	client := steam.NewClient(steam.Options{
-		BaseURL: cfg.SteamBaseURL,
-		Timeout: cfg.Timeout,
-	})
-	payload, err := client.FetchInventory(ctx, cfg.SteamID, cfg.AppID, cfg.ContextID)
-	if err != nil {
-		return nil, err
+	return app.Scanner{
+		InventoryProvider: inventoryProvider,
+		PriceProvider:     pricing.FilePriceProvider{},
+		Scorer:            pricing.Scorer{},
+		Clock:             func() time.Time { return time.Now().UTC() },
 	}
-
-	if !cfg.NoCache {
-		_ = store.Put(cacheKey, payload, time.Now().UTC(), cfg.CacheTTL)
-	}
-	return payload, nil
 }
 
-func loadPrices(path string) (pricing.PriceMap, error) {
-	if path == "" {
-		return pricing.PriceMap{}, nil
+func runPrices(args []string, stdout io.Writer, stderr io.Writer) int {
+	if len(args) == 0 {
+		fmt.Fprintln(stderr, "usage: velesmist prices <template>")
+		return apperrors.ExitInvalidInput
 	}
+	switch args[0] {
+	case "template":
+		cfg, err := config.ParsePriceTemplate(args[1:])
+		if err != nil {
+			fmt.Fprintf(stderr, "invalid input: %v\n", err)
+			return apperrors.ExitCode(err)
+		}
+		if err := writePriceTemplate(cfg, stdout); err != nil {
+			fmt.Fprintf(stderr, "prices template failed: %v\n", err)
+			return apperrors.ExitCode(err)
+		}
+		return apperrors.ExitSuccess
+	default:
+		fmt.Fprintf(stderr, "unknown prices command: %s\n", args[0])
+		return apperrors.ExitInvalidInput
+	}
+}
 
-	file, err := os.Open(path)
+func writePriceTemplate(cfg config.PriceTemplateConfig, stdout io.Writer) error {
+	if cfg.Output == "" {
+		return pricing.WritePriceCacheTemplate(stdout)
+	}
+	flags := os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+	if !cfg.Force {
+		flags = os.O_WRONLY | os.O_CREATE | os.O_EXCL
+	}
+	file, err := os.OpenFile(cfg.Output, flags, 0o644)
 	if err != nil {
-		return nil, apperrors.Wrap(apperrors.InvalidInput, "open price cache", err)
+		return apperrors.Wrap(apperrors.InvalidInput, "open price template output", err)
 	}
 	defer file.Close()
-
-	var raw map[string]pricing.PriceInput
-	decoder := json.NewDecoder(file)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&raw); err != nil {
-		return nil, apperrors.Wrap(apperrors.InvalidInput, "decode price cache", err)
-	}
-	return pricing.LoadPriceMap(raw)
+	return pricing.WritePriceCacheTemplate(file)
 }

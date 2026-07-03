@@ -9,7 +9,6 @@
 [![SBOM](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml)
 [![OSV Scanner](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml)
 [![Semgrep](https://github.com/asketmc/VelesMist/actions/workflows/semgrep.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/semgrep.yml)
-[![Release Security](https://github.com/asketmc/VelesMist/actions/workflows/release.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 VelesMist is a standalone Go CLI for read-only Steam/Dota 2 inventory analysis. It scans a public Steam inventory, aggregates marketable items, optionally applies a local price cache, and emits stable JSON or human-readable table output for manual review.
@@ -63,9 +62,11 @@ Release builds inject version metadata with ldflags:
 ## Usage
 
 ```bash
-velesmist scan --steam-id 76561198000000000
-velesmist scan --steam-id 76561198000000000 --format table
-velesmist scan --steam-id 76561198000000000 --format json
+velesmist scan --steam-id 76561198000000000 --game dota2
+velesmist scan --steam-id 76561198000000000 --game dota2 --format table
+velesmist scan --steam-id 76561198000000000 --game dota2 --format json
+velesmist scan --fixture internal/inventory/testdata/dota_inventory.json --format json
+velesmist prices template --output prices.json
 velesmist version
 ```
 
@@ -74,23 +75,34 @@ Optional price cache:
 ```bash
 velesmist scan \
   --steam-id 76561198000000000 \
+  --game dota2 \
   --format json \
   --price-cache prices.json \
   --min-price 5.00
 ```
 
+`--fixture` reads a local Steam inventory JSON file and does not contact Steam. It is intended for deterministic tests, demos, and local report-format checks.
+
 Price cache format:
 
 ```json
 {
-  "Golden Moonfall": {
-    "lowest_price": "$12.34"
-  },
-  "Jagged Honor | Blade": {
-    "buyer_price_cents": 400
+  "schema_version": "velesmist.price-cache.v1",
+  "currency": "USD",
+  "prices": {
+    "Golden Moonfall": {
+      "lowest_price": "$12.34",
+      "source": "manual-steam-market-check"
+    },
+    "Jagged Honor | Blade": {
+      "buyer_price_cents": 400,
+      "source": "manual"
+    }
   }
 }
 ```
+
+Price entries are keyed by Steam `market_hash_name`. `buyer_price_cents` is the gross buyer-facing price in cents. `lowest_price` and `median_price` accept common Steam-style money strings such as `$12.34`; VelesMist converts them into cents before calculating estimated fees and seller proceeds.
 
 ## JSON Output
 
@@ -104,16 +116,56 @@ JSON output is intended to be machine-readable and stable within the `velesmist.
   "contextid": "2",
   "currency": "USD",
   "threshold_cents": 500,
-  "items": [],
+  "items": [
+    {
+      "appid": 570,
+      "name": "Golden Moonfall",
+      "market_hash_name": "Golden Moonfall",
+      "count": 2,
+      "tradable": true,
+      "market_url": "https://steamcommunity.com/market/listings/570/Golden%20Moonfall",
+      "price_status": "priced",
+      "buyer_price_cents": 1234,
+      "estimated_fee_cents": 161,
+      "seller_receive_cents": 1073,
+      "total_buyer_price_cents": 2468,
+      "total_estimated_fee_cents": 322,
+      "total_receive_cents": 2146,
+      "price_source": "manual",
+      "liquidity_score": 0,
+      "confidence": "medium",
+      "recommendation": "sell",
+      "reason_codes": [
+        "MARKETABLE",
+        "PRICE_FOUND",
+        "STEAM_FEE_ESTIMATED",
+        "LIQUIDITY_UNKNOWN",
+        "MEETS_MIN_NET"
+      ],
+      "candidate": true
+    }
+  ],
   "candidates": [],
   "summary": {
-    "marketable_items": 0,
-    "priced_items": 0,
-    "candidate_items": 0,
-    "estimated_total_receive_cents": 0
+    "marketable_items": 1,
+    "priced_items": 1,
+    "missing_price_items": 0,
+    "skipped_items": 0,
+    "candidate_items": 1,
+    "estimated_total_gross_cents": 2468,
+    "estimated_total_fee_cents": 322,
+    "estimated_total_receive_cents": 2146
   }
 }
 ```
+
+Recommendations are read-only:
+
+- `sell` means the estimated seller proceeds for one item meet or exceed `--min-price`;
+- `skip` means the item has a price but is below the threshold;
+- `missing_price` means no local price entry matched the item's `market_hash_name`.
+
+`confidence`, `liquidity_score`, and `reason_codes` explain why an item received that recommendation. The first version marks locally supplied prices as `medium` confidence and reports unknown liquidity as `LIQUIDITY_UNKNOWN`; live market liquidity is intentionally not implemented yet.
 
 ## Exit Codes
 

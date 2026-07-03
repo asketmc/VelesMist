@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -42,7 +43,11 @@ type ScanResult struct {
 type Summary struct {
 	MarketableItems            int   `json:"marketable_items"`
 	PricedItems                int   `json:"priced_items"`
+	MissingPriceItems          int   `json:"missing_price_items"`
+	SkippedItems               int   `json:"skipped_items"`
 	CandidateItems             int   `json:"candidate_items"`
+	EstimatedTotalGrossCents   int64 `json:"estimated_total_gross_cents"`
+	EstimatedTotalFeeCents     int64 `json:"estimated_total_fee_cents"`
 	EstimatedTotalReceiveCents int64 `json:"estimated_total_receive_cents"`
 }
 
@@ -52,11 +57,19 @@ func BuildScanResult(input ScanInput) ScanResult {
 		CandidateItems:  len(input.Candidates),
 	}
 	for _, item := range input.Items {
-		if item.PriceStatus == "priced" {
+		if item.PriceStatus == pricing.PriceStatusPriced {
 			summary.PricedItems++
+		}
+		switch item.Recommendation {
+		case pricing.RecommendationMissingPrice:
+			summary.MissingPriceItems++
+		case pricing.RecommendationSkip:
+			summary.SkippedItems++
 		}
 	}
 	for _, item := range input.Candidates {
+		summary.EstimatedTotalGrossCents += item.TotalBuyerPriceCents
+		summary.EstimatedTotalFeeCents += item.TotalEstimatedFeeCents
 		summary.EstimatedTotalReceiveCents += item.TotalReceiveCents
 	}
 	return ScanResult{
@@ -81,24 +94,37 @@ func WriteJSON(w io.Writer, result ScanResult) error {
 
 func WriteTable(w io.Writer, result ScanResult) error {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "ITEM\tCOUNT\tBUYER\tYOU_RECEIVE\tTOTAL\tSTATUS")
+	fmt.Fprintln(tw, "ITEM\tCOUNT\tGROSS\tFEE\tYOU_RECEIVE\tTOTAL\tCONFIDENCE\tRECOMMENDATION\tREASONS\tMARKET_URL")
 	for _, item := range result.Items {
-		buyer := "-"
+		gross := "-"
+		fee := "-"
 		seller := "-"
 		total := "-"
-		status := item.PriceStatus
-		if item.Candidate {
-			status = "candidate"
-		}
-		if item.PriceStatus == "priced" {
-			buyer = result.Currency + " " + pricing.FormatCents(item.BuyerPriceCents)
+		if item.PriceStatus == pricing.PriceStatusPriced {
+			gross = result.Currency + " " + pricing.FormatCents(item.BuyerPriceCents)
+			fee = result.Currency + " " + pricing.FormatCents(item.EstimatedFeeCents)
 			seller = result.Currency + " " + pricing.FormatCents(item.SellerReceiveCents)
 			total = result.Currency + " " + pricing.FormatCents(item.TotalReceiveCents)
 		}
-		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\t%s\n", item.MarketHashName, item.Count, buyer, seller, total, status)
+		fmt.Fprintf(tw, "%s\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			item.MarketHashName,
+			item.Count,
+			gross,
+			fee,
+			seller,
+			total,
+			item.Confidence,
+			item.Recommendation,
+			strings.Join(item.ReasonCodes, ","),
+			item.MarketURL,
+		)
 	}
-	fmt.Fprintf(tw, "\nCandidates: %d Estimated total receive: %s %s\n",
+	fmt.Fprintf(tw, "\nSell recommendations: %d Estimated gross: %s %s Estimated fees: %s %s Estimated receive: %s %s\n",
 		result.Summary.CandidateItems,
+		result.Currency,
+		pricing.FormatCents(result.Summary.EstimatedTotalGrossCents),
+		result.Currency,
+		pricing.FormatCents(result.Summary.EstimatedTotalFeeCents),
 		result.Currency,
 		pricing.FormatCents(result.Summary.EstimatedTotalReceiveCents),
 	)

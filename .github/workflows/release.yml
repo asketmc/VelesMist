@@ -58,7 +58,7 @@ jobs:
       - name: CycloneDX SBOM
         uses: CycloneDX/gh-gomod-generate-sbom@efc74245d6802c8cefd925620515442756c70d8f # v2.0.0
         with:
-          version: v1
+          version: v1.10.0
           args: mod -licenses -json -output archives/sbom.cdx.json
       - name: Create checksums
         run: (cd archives && sha256sum * > SHA256SUMS.txt)
