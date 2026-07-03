@@ -142,6 +142,63 @@ func TestPullRequestTemplateCoversQAAndSecurity(t *testing.T) {
 	}
 }
 
+func TestOSSAssuranceCoversRequiredControls(t *testing.T) {
+	root := repoRoot(t)
+	body := readFile(t, filepath.Join(root, "docs", "OSS_ASSURANCE.md"))
+	lowerBody := strings.ToLower(body)
+	forbidden := []string{"certified", "certification", "external audit"}
+	for _, term := range forbidden {
+		if strings.Contains(lowerBody, term) {
+			t.Fatalf("docs/OSS_ASSURANCE.md contains external assurance wording %q", term)
+		}
+	}
+
+	allowedStatuses := map[string]bool{
+		"implemented":             true,
+		"partial":                 true,
+		"planned":                 true,
+		"not applicable":          true,
+		"requires GitHub setting": true,
+		"requires first release":  true,
+	}
+	controls := ossAssuranceControls(t, body)
+	for control, status := range controls {
+		if !allowedStatuses[status] {
+			t.Fatalf("docs/OSS_ASSURANCE.md control %q has unsupported status %q", control, status)
+		}
+	}
+
+	requiredControls := []string{
+		"OpenSSF Scorecard",
+		"CI",
+		"CodeQL",
+		"Dependabot",
+		"Dependency Review",
+		"Secret scanning / push protection",
+		"REUSE",
+		"SPDX SBOM",
+		"CycloneDX SBOM",
+		"SLSA / GitHub artifact attestations",
+		"Sigstore / cosign",
+		"govulncheck",
+		"OSV Scanner",
+		"Semgrep",
+		"workflow pinning",
+		"Security Insights",
+		"CODEOWNERS",
+		"branch protection",
+		"QA_MAP",
+		"ARTIFACTS",
+		"output schemas/contracts",
+		"release verification docs",
+	}
+	for _, control := range requiredControls {
+		if _, ok := controls[control]; !ok {
+			t.Fatalf("docs/OSS_ASSURANCE.md missing required control %q", control)
+		}
+	}
+}
+
 type actionPin struct {
 	tag string
 	sha string
@@ -175,6 +232,31 @@ func pinningDocPins(t *testing.T, path string) map[string]actionPin {
 		pins[match[1]] = actionPin{tag: match[2], sha: match[3]}
 	}
 	return pins
+}
+
+func ossAssuranceControls(t *testing.T, body string) map[string]string {
+	t.Helper()
+	controls := map[string]string{}
+	for _, line := range strings.Split(body, "\n") {
+		line = strings.TrimSpace(line)
+		if !strings.HasPrefix(line, "|") || strings.Contains(line, "---") {
+			continue
+		}
+		columns := strings.Split(strings.Trim(line, "|"), "|")
+		if len(columns) != 3 {
+			continue
+		}
+		control := strings.TrimSpace(columns[0])
+		status := strings.TrimSpace(columns[1])
+		if control == "Control" && status == "Status" {
+			continue
+		}
+		controls[control] = status
+	}
+	if len(controls) == 0 {
+		t.Fatal("docs/OSS_ASSURANCE.md controls table was not parsed")
+	}
+	return controls
 }
 
 func repoRoot(t *testing.T) string {
