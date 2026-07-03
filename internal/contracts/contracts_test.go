@@ -247,9 +247,9 @@ func validatePriceCache(cache map[string]any) error {
 func validatePriceEntry(price map[string]any) error {
 	allowed := map[string]bool{
 		"buyer_price_cents": true,
-		"lowest_price":       true,
-		"median_price":       true,
-		"source":             true,
+		"lowest_price":      true,
+		"median_price":      true,
+		"source":            true,
 	}
 	for key := range price {
 		if !allowed[key] {
