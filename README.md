@@ -45,6 +45,8 @@ make test
 make build
 ```
 
+Requires Go 1.26 or newer for source builds.
+
 Equivalent build command:
 
 ```bash
