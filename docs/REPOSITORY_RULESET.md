@@ -4,6 +4,25 @@ Target repository: `asketmc/VelesMist`
 
 GitHub rulesets and push protection are repository settings. They cannot be fully enforced from files alone.
 
+## Current Observed Settings
+
+Verified through the GitHub repository API on 2026-07-03:
+
+- secret scanning: enabled;
+- secret scanning push protection: enabled;
+- Dependabot security updates: enabled;
+- classic `main` branch protection: enabled;
+- required pull request reviews: enabled;
+- Code Owners review requirement: enabled;
+- stale review dismissal: enabled;
+- required status checks must be up to date: enabled;
+- linear history: enabled;
+- conversation resolution: enabled;
+- force pushes: blocked;
+- branch deletions: blocked.
+
+The repository currently has classic branch protection and no repository rulesets.
+
 ## Bootstrap Order
 
 1. Push the repository to `main`.
@@ -27,20 +46,20 @@ Enable:
 - block branch deletion;
 - require linear history if using squash/rebase merge only.
 
-Required checks:
+Required checks currently enforced:
 
 - `CI tests`;
-- `CodeQL`;
-- `Dependency Review`;
-- `Docs`;
-- `REUSE`;
-- `OSV Scanner`.
+- `Analyze Go`;
+- `dependency-review`;
+- `reuse`;
+- `scan`;
+- `semgrep`;
+- `docs`;
+- `sbom`.
 
 Optional after stabilization:
 
-- `Semgrep`;
-- `Scorecard`;
-- `SBOM`.
+- `Scorecard`.
 
 ## Repository Settings
 
