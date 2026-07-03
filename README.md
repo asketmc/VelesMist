@@ -15,6 +15,8 @@ VelesMist is a standalone Go CLI for read-only Steam/Dota 2 inventory analysis. 
 
 It does not log in, does not accept Steam cookies, does not create market listings, and does not automate Steam Guard confirmations.
 
+The same binary also includes a minimal local web UI for users who prefer not to run scans through command-line flags. The UI listens on localhost only and uses the same read-only scanner pipeline as the CLI.
+
 ## Supported Platforms
 
 Release builds target:
@@ -67,6 +69,7 @@ velesmist scan --steam-id 76561198000000000 --game dota2 --format table
 velesmist scan --steam-id 76561198000000000 --game dota2 --format json
 velesmist scan --fixture internal/inventory/testdata/dota_inventory.json --format json
 velesmist prices template --output prices.json
+velesmist ui
 velesmist version
 ```
 
@@ -82,6 +85,38 @@ velesmist scan \
 ```
 
 `--fixture` reads a local Steam inventory JSON file and does not contact Steam. It is intended for deterministic tests, demos, and local report-format checks.
+
+## Local Web UI
+
+```bash
+velesmist ui
+```
+
+By default this starts a small local server on:
+
+```text
+http://127.0.0.1:8765/
+```
+
+and attempts to open it in the default browser. The server binds to localhost only. It does not expose a LAN listener, does not add Electron, Node, Python, JVM, or Docker runtime dependencies, and does not change the no-login/no-cookies/no-selling model.
+
+Options:
+
+```bash
+velesmist ui --addr 127.0.0.1:8765
+velesmist ui --addr 127.0.0.1:0 --open=false
+```
+
+If a local firewall blocks loopback listening, allow the VelesMist executable to listen on localhost TCP for the selected UI port. Steam inventory fetches still require outbound HTTPS to `steamcommunity.com:443`.
+
+The UI provides:
+
+- Steam64 ID scan for Dota 2 public inventories;
+- optional local price cache path;
+- optional offline fixture path for deterministic demos;
+- table and raw JSON report views.
+
+It intentionally does not implement native desktop widgets, Steam login, private inventory access, automatic market listings, or live market price scraping.
 
 Price cache format:
 
