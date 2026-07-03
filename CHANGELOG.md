@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-03
+
+### Fixed
+
+- Fixed real Steam inventory scans for larger Dota 2 inventories by replacing the rejected `count=5000` request with safe paginated requests.
+- Accepted Steam's numeric `more_items` pagination flag in addition to boolean values.
+- Clarified HTTP 400 handling as a rejected Steam inventory request instead of implying the inventory is private.
+
+## [0.3.0] - 2026-07-03
+
+### Added
+
+- Minimal localhost web UI via `velesmist ui`.
+- UI contract tests for localhost binding, scan API behavior, sanitized errors, and offline fixture scans.
+- Focused `make coverage-ui` gate requiring at least 80% statement coverage for `cmd/velesmist`.
+
+### Changed
+
+- `make verify` now includes the focused UI/CLI coverage gate.
+
 ## [0.2.0] - 2026-07-03
 
 ### Added
@@ -29,5 +49,7 @@
 - Unit, integration, golden, fuzz, and assurance tests.
 - OSS assurance docs and GitHub Actions supply-chain workflows.
 
+[0.3.1]: https://github.com/asketmc/VelesMist/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/asketmc/VelesMist/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/asketmc/VelesMist/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/asketmc/VelesMist/releases/tag/v0.1.0
