@@ -9,7 +9,6 @@
 [![SBOM](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/sbom.yml)
 [![OSV Scanner](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/osv-scanner.yml)
 [![Semgrep](https://github.com/asketmc/VelesMist/actions/workflows/semgrep.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/semgrep.yml)
-[![Release Security](https://github.com/asketmc/VelesMist/actions/workflows/release.yml/badge.svg)](https://github.com/asketmc/VelesMist/actions/workflows/release.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 VelesMist is a standalone Go CLI for read-only Steam/Dota 2 inventory analysis. It scans a public Steam inventory, aggregates marketable items, optionally applies a local price cache, and emits stable JSON or human-readable table output for manual review.
@@ -28,7 +27,7 @@ Runtime model: one static Go binary built with `CGO_ENABLED=0`. Docker, Python, 
 
 ## Install From Releases
 
-Download the archive for your OS and architecture from:
+After the first release is published, download the archive for your OS and architecture from:
 
 ```text
 https://github.com/asketmc/VelesMist/releases
@@ -152,8 +151,10 @@ See:
 ```bash
 make test
 make lint
+make typecheck
 make vet
 make vuln
+make coverage
 make build
 make snapshot-release
 ```

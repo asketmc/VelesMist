@@ -11,6 +11,12 @@ This project implements controls for supply-chain and open-source hygiene. It is
 | Dependabot | Implemented | `.github/dependabot.yml` |
 | Dependency Review | Implemented | `.github/workflows/dependency-review.yml` |
 | Docs checks | Implemented | `.github/workflows/docs.yml`, `internal/assurance` |
+| Format check | Implemented | `make format`, `.github/workflows/ci.yml` |
+| Lint / static analysis | Implemented | `make lint`, Staticcheck pinned to `v0.7.0`, `.github/workflows/ci.yml` |
+| Typecheck | Implemented | `make typecheck`, `.github/workflows/ci.yml` |
+| Coverage artifact | Implemented | `make coverage`, CI uploads `coverage.out` and `coverage.txt` artifacts |
+| Coverage badge | Not planned | No external coverage SaaS or generated Pages badge is configured; avoid misleading vanity badges |
+| Mutation testing | Not planned | Deferred until stable core APIs justify the extra runtime cost |
 | Secret Scanning / Push Protection | Implemented in GitHub setting | Verified enabled through the GitHub repository API on 2026-07-03 |
 | REUSE compliance | Implemented | `REUSE.toml`, `LICENSES/MIT.txt`, `.github/workflows/reuse.yml` |
 | SPDX license metadata | Implemented | SPDX headers and REUSE annotations |

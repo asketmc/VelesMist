@@ -10,20 +10,33 @@ BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo unknown)
 DIRTY ?= $(shell test -n "$$(git status --porcelain 2>/dev/null)" && echo dirty || echo clean)
 LDFLAGS := -s -w -X $(PKG)/internal/version.Version=$(VERSION) -X $(PKG)/internal/version.Commit=$(COMMIT) -X $(PKG)/internal/version.BuildDate=$(BUILD_DATE) -X $(PKG)/internal/version.Dirty=$(DIRTY)
 GOVULNCHECK_VERSION ?= latest
+STATICCHECK_VERSION ?= v0.7.0
 
-.PHONY: test lint vet vuln build snapshot-release clean
+.PHONY: test lint format staticcheck typecheck vet vuln coverage build snapshot-release clean
 
 test:
 	go test ./...
 
-lint:
+format:
 	@test -z "$$(gofmt -l .)" || (gofmt -l . && exit 1)
+
+staticcheck:
+	go run honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION) ./...
+
+lint: format staticcheck
+
+typecheck:
+	go test -run '^$$' ./...
 
 vet:
 	go vet ./...
 
 vuln:
 	go run golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION) ./...
+
+coverage:
+	go test -covermode=atomic -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out | tee coverage.txt
 
 build:
 	CGO_ENABLED=0 go build -trimpath -ldflags="$(LDFLAGS)" -o $(DIST)/$(APP) ./cmd/velesmist
