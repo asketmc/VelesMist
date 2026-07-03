@@ -28,9 +28,12 @@ This project implements controls for supply-chain and open-source hygiene. It is
 | SLSA provenance / artifact attestations | Requires first release | `.github/workflows/release.yml` |
 | Sigstore / cosign release signing | Requires first release | `.github/workflows/release.yml` |
 | Workflow pinning policy | Implemented | `docs/WORKFLOW_PINNING.md`, `internal/assurance` tests |
-| Security Insights metadata | Implemented | `security-insights.yml` |
+| Security Insights metadata | Implemented | `security-insights.yml` uses OpenSSF Security Insights schema `2.2.0`; no fake contact email or unverified release claim |
 | Branch protection / required checks | Implemented in GitHub setting | Verified classic `main` branch protection through the GitHub repository API on 2026-07-03 |
 | CODEOWNERS review control | Implemented and enforced in GitHub setting | `.github/CODEOWNERS`; branch protection requires Code Owners review |
+| Good first issue labels | Implemented in GitHub setting | Verified labels: `good first issue`, `security`, `dependencies`, `release`, `documentation` |
+| All Contributors | Implemented | `.all-contributorsrc`, README badge |
+| pre-commit.ci | Planned | Requires installing the external pre-commit.ci GitHub app; no placeholder badge is used |
 | Docker image / container scan | Not applicable | No container distribution strategy |
 | SonarCloud / Codecov / FOSSA / Snyk | Not planned | Avoid external SaaS badges without a concrete need |
 | Renovate | Not planned | Dependabot is the selected dependency bot |

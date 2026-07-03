@@ -1,0 +1,26 @@
+{
+  "projectName": "VelesMist",
+  "projectOwner": "asketmc",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "contributorsPerLine": 7,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "asketmc",
+      "name": "Asketmc",
+      "avatar_url": "https://avatars.githubusercontent.com/u/117373630?v=4",
+      "profile": "https://github.com/asketmc",
+      "contributions": [
+        "code",
+        "doc",
+        "infra",
+        "test"
+      ]
+    }
+  ]
+}

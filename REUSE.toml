@@ -3,6 +3,7 @@ version = 1
 [[annotations]]
 path = [
   ".github/**",
+  ".all-contributorsrc",
   "docs/**",
   "internal/**/testdata/**",
   "README.md",
